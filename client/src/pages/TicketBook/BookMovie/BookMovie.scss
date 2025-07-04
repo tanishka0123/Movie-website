@@ -1,0 +1,386 @@
+@import "../../../mixins.scss";
+.detailsBanner {
+  width: 100%;
+  background-color: var(--black);
+  padding-top: 100px;
+  margin-bottom: 150px;
+  @include md {
+    margin-bottom: 0;
+    padding-top: 120px;
+    min-height: 790px;
+  }
+  .backdrop-img {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0.1;
+    overflow: hidden;
+    .lazy-load-image-background {
+      width: 100%;
+      height: 100%;
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+      }
+    }
+  }
+  .opacity-layer {
+    width: 100%;
+    height: 250px;
+    background: linear-gradient(180deg, rgba(4, 21, 45, 0) 0%, #04152d 79.17%);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+  }
+
+  .content {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 30px;
+    @include md {
+      gap: 50px;
+      flex-direction: row;
+    }
+    .left {
+      flex-shrink: 0;
+      .posterImg {
+        width: 100%;
+        display: block;
+        border-radius: 12px;
+        @include md {
+          max-width: 350px;
+        }
+      }
+    }
+    .right {
+      color: white;
+      .titleContainer {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+      }
+      .title {
+        font-size: 28px;
+        line-height: 40px;
+        @include md {
+          font-size: 34px;
+          line-height: 44px;
+        }
+      }
+      .subtitle {
+        font-size: 16px;
+        line-height: 24px;
+        margin-bottom: 15px;
+        font-style: italic;
+        opacity: 0.5;
+        @include md {
+          font-size: 20px;
+          line-height: 28px;
+        }
+      }
+      .genres {
+        display: flex;
+        gap: 5px;
+        .genre {
+          background-color: var(--pink);
+          padding: 3px 5px;
+          font-size: 12px;
+          border-radius: 4px;
+          color: white;
+          white-space: nowrap;
+        }
+      }
+      .overview {
+        margin-bottom: 25px;
+        .heading {
+          font-size: 24px;
+          margin-bottom: 10px;
+        }
+        .description {
+          line-height: 24px;
+          @include md {
+            padding-right: 100px;
+          }
+        }
+      }
+      .circleRating {
+        max-width: 70px;
+        background-color: var(--black2);
+        @include md {
+          max-width: 90px;
+        }
+        .CircularProgressbar-text {
+          fill: white;
+        }
+      }
+      .playbtn {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        cursor: pointer;
+        svg {
+          width: 60px;
+          @include md {
+            width: 80px;
+          }
+        }
+        .text {
+          font-size: 20px;
+          transition: all 0.7s ease-in-out;
+        }
+        .triangle {
+          stroke-dasharray: 240;
+          stroke-dashoffset: 480;
+          stroke: white;
+          transform: translateY(0);
+          transition: all 0.7s ease-in-out;
+        }
+        .circle {
+          stroke: white;
+          stroke-dasharray: 650;
+          stroke-dashoffset: 1300;
+          transition: all 0.5s ease-in-out;
+        }
+        &:hover {
+          .text {
+            color: var(--pink);
+          }
+          .triangle {
+            stroke-dashoffset: 0;
+            opacity: 1;
+            stroke: var(--pink);
+            animation: trailorPlay 0.7s ease-in-out;
+          }
+          .circle {
+            stroke-dashoffset: 0;
+            stroke: var(--pink);
+          }
+        }
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        gap: 25px;
+        margin-bottom: 25px;
+      }
+
+      .info {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 15px 0;
+        display: flex;
+        .infoItem {
+          margin-right: 10px;
+          display: flex;
+          flex-flow: row wrap;
+        }
+        .text {
+          margin-right: 10px;
+          opacity: 0.5;
+          line-height: 24px;
+          &.bold {
+            font-weight: 600;
+            opacity: 1;
+          }
+        }
+      }
+    }
+  }
+
+  button {
+    width: 100px;
+    height: 50px;
+    background: var(--gradient);
+    color: white;
+
+    border-radius: 25px 25px;
+    outline: 0;
+    border: 0;
+    font-size: 16px;
+    cursor: pointer;
+    @include md {
+      width: 200px;
+      height: 60px;
+      font-size: 18px;
+    }
+  }
+
+  .detailsBannerSkeleton {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    gap: 25px;
+    @include md {
+      gap: 50px;
+      flex-direction: row;
+    }
+    .contentWrapper {
+      display: flex;
+      gap: 50px;
+    }
+    .left {
+      flex-shrink: 0;
+      width: 100%;
+      display: block;
+      border-radius: 12px;
+      aspect-ratio: 1/1.5;
+      @include md {
+        max-width: 350px;
+      }
+    }
+    .right {
+      width: 100%;
+      .row {
+        width: 100%;
+        height: 25px;
+        margin-bottom: 20px;
+        border-radius: 50px;
+        &:nth-child(2) {
+          width: 75%;
+          margin-bottom: 50px;
+        }
+        &:nth-child(5) {
+          width: 50%;
+          margin-bottom: 50px;
+        }
+      }
+    }
+  }
+}
+
+.datePopup {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  visibility: hidden;
+  z-index: 9;
+  .opacityLayer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(3.5px);
+    -webkit-backdrop-filter: blur(3.5px);
+    opacity: 0;
+    transition: opacity 400ms;
+  }
+  .datePicker {
+    position: relative;
+    width: 900px;
+    height: 200px;
+    aspect-ratio: 16 / 9;
+    background: linear-gradient(98.37deg, #f89e00 0.99%, #da2f68 100%);
+    transform: scale(0.2);
+    transition: transform 250ms;
+    border-radius: 20px;
+
+    .chooseDateContainer {
+      height: 100%;
+      padding: 30px 40px;
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+      justify-content: space-between;
+      color: #fff;
+    }
+
+    .DateContent {
+      display: flex;
+      flex-direction: column;
+    }
+    .chooseDateTitle {
+      font-size: 20px;
+      font-weight: 600;
+      padding-bottom: 10px;
+    }
+
+    .dateScroller {
+      display: flex;
+      align-items: center;
+      overflow-x: auto;
+      gap: 10px;
+
+      .arrowBtn {
+        background: transparent;
+        border: none;
+        font-size: 20px;
+        color: white;
+        cursor: pointer;
+      }
+
+      .dateBox {
+        background: transparent;
+        border: 2px solid rgba(255, 255, 255, 0.326);
+        border-radius: 10px;
+        padding: 15px;
+        min-width: 60px;
+        text-align: center;
+        cursor: pointer;
+        transition: 0.3s;
+        font-size: 15px;
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        &.active {
+          background-color: #fff;
+          color: #d83d71;
+          font-weight: bold;
+        }
+      }
+    }
+
+    .bookNowWrapper {
+      display: flex;
+      justify-content: flex-end;
+
+      .bookNowBtn {
+        background: #fff;
+        color: #d83d71;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 50px;
+        font-weight: bold;
+        font-size: 19px;
+        cursor: pointer;
+        transition: all 0.3s;
+
+        &:hover {
+          background: #ffe0ec;
+        }
+      }
+    }
+
+    .closeBtn {
+      position: absolute;
+      top: -20px;
+      right: 0;
+      color: white;
+      cursor: pointer;
+    }
+  }
+  &.visible {
+    opacity: 1;
+    visibility: visible;
+    .opacityLayer {
+      opacity: 1;
+    }
+    .datePicker {
+      transform: scale(1);
+    }
+  }
+}

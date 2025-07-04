@@ -1,0 +1,59 @@
+@import "../../../mixins.scss";
+.TicketPage {
+  min-height: 700px;
+  padding-top: 100px;
+  .resultNotFound {
+    font-size: 24px;
+    color: var(--black-light);
+  }
+}
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 25px;
+  flex-direction: column;
+  @include md {
+    flex-direction: row;
+  }
+}
+.pageTitle {
+  font-size: 24px;
+  line-height: 34px;
+  color: white;
+  margin-bottom: 20px;
+  @include md {
+    margin-bottom: 0;
+  }
+}
+.btn {
+  width: 100px;
+  height: 50px;
+  background: var(--gradient);
+  color: white;
+  outline: 0;
+  border: 0;
+  border-radius: 30px 30px;
+  font-size: 16px;
+  cursor: pointer;
+  @include md {
+    width: 150px;
+    height: 45px;
+    font-size: 20px;
+  }
+}
+
+.content {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 10px;
+  margin-bottom: 50px;
+  @include md {
+    gap: 20px;
+  }
+  .movieCard {
+    .posterBlock {
+      margin-bottom: 30px;
+    }
+  }
+}
+

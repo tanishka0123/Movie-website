@@ -1,0 +1,55 @@
+.carouselSection {
+  position: relative;
+  margin-bottom: 100px;
+  & > .contentWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .carouselTitle {
+    font-size: 24px;
+    color: white;
+    font-weight: normal;
+  }
+
+
+  .blur-circle1 {
+    position: absolute;
+    z-index: 0;
+    width: 18.5rem;
+    height: 18.5rem;
+    border-radius: 9999px;
+    background-color: #c9275da4;
+    filter: blur(120px);
+    top: 190px;
+    left: 1200px;
+    pointer-events: none;
+  }
+
+  .blur-circle2 {
+    position: absolute;
+    z-index: 0;
+    width: 19.5rem;
+    height: 19.5rem;
+    border-radius: 9999px;
+    background-color: #c9275da4;
+    filter: blur(120px);
+    top: 190px;
+    left: 20px;
+    pointer-events: none;
+  }
+
+  .blur-circle3 {
+    position: absolute;
+    z-index: 0;
+    width: 18.5rem;
+    height: 18.5rem;
+    border-radius: 9999px;
+    background-color: #c9275da4;
+    filter: blur(120px);
+    top: 0px;
+    left: 20px;
+    pointer-events: none;
+  }
+}

@@ -1,0 +1,104 @@
+.admin-sidebar {
+  position: fixed;
+  height: calc(100vh - 60px);
+  left: 0;
+  top: 60px;
+  width: 240px;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(3.5px);
+  color: #fff;
+  transition: width 0.6s ease;
+  overflow-y: auto;
+  z-index: 100;
+
+  .icons {
+    display: none;
+  }
+
+  &.collapsed {
+    width: 78px;
+
+    .icons {
+      display: inline;
+    }
+
+    .link-text {
+      display: none;
+    }
+
+    .profile-section .profile-img {
+      width: 40px;
+      height: 40px;
+      margin-bottom: 20px;
+    }
+  }
+
+  .toggle-btn {
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    padding: 20px;
+    height: 50px;
+    cursor: pointer;
+    font-size: 1.5rem;
+    transition: background 2s ease;
+  }
+
+  .profile-section {
+    display: flex;
+    justify-content: center;
+    margin: 3rem 0;
+
+    .profile-img {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: #da2f68 3px solid;
+    }
+  }
+
+  .nav-links {
+    list-style: none;
+    padding: 0;
+    margin-top: 1.5rem;
+
+    li {
+      margin: 0.25rem 0;
+
+      .link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        padding: 0.75rem 1.5rem;
+        color: #cbd5e1;
+        text-decoration: none;
+        transition: background 0.2s ease, color 0.2s ease;
+
+        .link-text {
+          line-height: 20px;
+          font-size: 18px;
+          transition: opacity 0.3s ease;
+        }
+
+        .icons {
+          font-size: 20px;
+          color: #cbd5e1;
+          transition: font-size 0.3s ease, color 0.3s ease;
+        }
+
+        &:hover,
+        &.active {
+          color: #da2f68;
+          opacity: 10;
+
+          .icons {
+            font-size: 22px;
+            color: #da2f68;
+          }
+        }
+      }
+    }
+  }
+}
