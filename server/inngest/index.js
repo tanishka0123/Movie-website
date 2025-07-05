@@ -34,13 +34,15 @@ const syncUserDeletion = inngest.createFunction(
   async ({ event }) => {
     try {
       const { id } = event.data;
-      console.log("Deleting user with id:", id);
-      await User.findByIdAndDelete(id);
+      console.log("🔥 Deletion event received for ID:", id);
+      const deleted = await User.findByIdAndDelete(id);
+      console.log("🗑️ Deleted user:", deleted);
     } catch (error) {
-      console.error("Error in syncUserDeletion:", error);
+      console.error("❌ Error deleting user:", error);
     }
   }
 );
+
 
 // Inngest function to update user data
 const syncUserUpdation = inngest.createFunction(
