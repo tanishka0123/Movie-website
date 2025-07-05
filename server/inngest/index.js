@@ -1,4 +1,3 @@
-import e from "express";
 import { Inngest } from "inngest";
 import User from "../models/User.js";
 
@@ -28,7 +27,7 @@ const syncUserDeletion = inngest.createFunction(
   { event: "clerk.user.deleted" },
   async ({ event }) => {
     const { id } = event.data;
-    await User.findByIdAndDelete(id);
+    await User.findByIdAndDelete({id});
   }
 );
 
@@ -47,7 +46,7 @@ const syncUserUpdation = inngest.createFunction(
       image: image_url,
     };
 
-    await User.findByIdAndUpdate(id, userData);
+    await User.findByIdAndUpdate({id}, userData, { new: true });
   }
 );
 
