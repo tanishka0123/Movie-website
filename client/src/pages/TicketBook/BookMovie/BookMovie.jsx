@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { dummyShowsData } from "../DummyData.js";
+import { dummyShowsData, dummyCastsData } from "../DummyData.js";
 import "./BookMovie.scss";
 import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
@@ -10,6 +10,7 @@ import { PlayIcon } from "../../details/PlayButton.jsx";
 import VideoPopup from "../../../components/videoPopup/VideoPopup.jsx";
 import DatePopUp from "./DatePopUp.jsx";
 import timeFormat from "../../../lib/timeFormat.js";
+import Similar from "./Similar.jsx";
 
 function BookMovie() {
   const { movieId } = useParams();
@@ -18,32 +19,32 @@ function BookMovie() {
   const [show, setShow] = useState(false);
   const [videoId, setVideoId] = useState(null);
   const [book, setBook] = useState(false);
+
   const nav = useNavigate();
 
   useEffect(() => {
     setLoading(true);
     const found = dummyShowsData.find((item) => item.id === movieId);
-    if (found=== undefined) {
+    if (found === undefined) {
       setLoading(false);
       nav("/404");
-    } 
-      setData(found);
-      setLoading(false);
-    
+    }
+    setData(found);
+    setLoading(false);
   }, [movieId]);
 
-
   return (
-    <div className="detailsBanner">
-      {!loading ? (
-        <>
-          {!!data && (
-            <React.Fragment>
-              <div className="backdrop-img">
-                <Img src={data.backdrop_path} />
-              </div>
-              <div className="opacity-layer"></div>
-              <ContentWrapper>
+    <ContentWrapper>
+      <div className="detailsBanner">
+        {!loading ? (
+          <>
+            {!!data && (
+              <React.Fragment>
+                <div className="backdrop-img">
+                  <Img src={data.backdrop_path} />
+                </div>
+                <div className="opacity-layer"></div>
+
                 <div className="content">
                   <div className="left">
                     <Img className="posterImg" src={data.poster_path} />
@@ -142,27 +143,46 @@ function BookMovie() {
                   videoId={videoId}
                   setVideoId={setVideoId}
                 />
-              </ContentWrapper>
-            </React.Fragment>
-          )}
-        </>
-      ) : (
-        <div className="detailsBannerSkeleton">
-          <ContentWrapper>
-            <div className="left skeleton"></div>
-            <div className="right">
-              <div className="row skeleton"></div>
-              <div className="row skeleton"></div>
-              <div className="row skeleton"></div>
-              <div className="row skeleton"></div>
-              <div className="row skeleton"></div>
-              <div className="row skeleton"></div>
-              <div className="row skeleton"></div>
+              </React.Fragment>
+            )}
+
+            <div className="booking-castSection">
+              <div className="booking-sectionHeading">Top Cast</div>
+              <div className="booking-listItems">
+                {dummyCastsData.map((item) => {
+                  return (
+                    <div key={item.id} className="booking-listItem">
+                      <div className="booking-profileImg">
+                        <img src={item.profile_path} />
+                      </div>
+                      <div className="booking-name">{item.name}</div>
+                      <div className="character">{item.character}</div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          </ContentWrapper>
-        </div>
-      )}
-    </div>
+
+            <Similar />
+          </>
+        ) : (
+          <div className="detailsBannerSkeleton">
+            <ContentWrapper>
+              <div className="left skeleton"></div>
+              <div className="right">
+                <div className="row skeleton"></div>
+                <div className="row skeleton"></div>
+                <div className="row skeleton"></div>
+                <div className="row skeleton"></div>
+                <div className="row skeleton"></div>
+                <div className="row skeleton"></div>
+                <div className="row skeleton"></div>
+              </div>
+            </ContentWrapper>
+          </div>
+        )}
+      </div>
+    </ContentWrapper>
   );
 }
 

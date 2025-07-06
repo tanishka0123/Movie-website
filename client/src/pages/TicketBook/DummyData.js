@@ -803,89 +803,106 @@ export const dummyShowsData = [
   },
 ];
 
-const dummyCastsData = [
+export const dummyCastsData = [
   {
     name: "Milla Jovovich",
+    character: "funny",
     profile_path:
       "https://image.tmdb.org/t/p/original/usWnHCzbADijULREZYSJ0qfM00y.jpg",
   },
   {
     name: "Dave Bautista",
+    character: "funny",
     profile_path:
       "https://image.tmdb.org/t/p/original/snk6JiXOOoRjPtHU5VMoy6qbd32.jpg",
   },
   {
     name: "Arly Jover",
+    character: "funny",
     profile_path:
       "https://image.tmdb.org/t/p/original/zmznPrQ9GSZwcOIUT0c3GyETwrP.jpg",
   },
   {
     name: "Amara Okereke",
+    character: "funny",
     profile_path:
       "https://image.tmdb.org/t/p/original/nTSPtzWu6deZTJtWXHUpACVznY4.jpg",
   },
   {
     name: "Fraser James",
+    character: "funny",
     profile_path:
       "https://image.tmdb.org/t/p/original/mGAPQG2OKTgdKFkp9YpvCSqcbgY.jpg",
   },
   {
     name: "Deirdre Mullins",
+    character: "funny",
     profile_path:
       "https://image.tmdb.org/t/p/original/lJm89neuiVlYISEqNpGZA5kTAnP.jpg",
   },
   {
     name: "Sebastian Stankiewicz",
+    character: "funny",
     profile_path:
       "https://image.tmdb.org/t/p/original/hLN0Ca09KwQOFLZLPIEzgTIbqqg.jpg",
   },
   {
     name: "Tue Lunding",
+    character: "funny",
     profile_path:
       "https://image.tmdb.org/t/p/original/qY4W0zfGBYzlCyCC0QDJS1Muoa0.jpg",
   },
   {
     name: "Jacek Dzisiewicz",
+    character: "funny",
     profile_path:
       "https://image.tmdb.org/t/p/original/6Ksb8ANhhoWWGnlM6O1qrySd7e1.jpg",
   },
   {
     name: "Ian Hanmore",
+    character: "funny",
     profile_path:
       "https://image.tmdb.org/t/p/original/yhI4MK5atavKBD9wiJtaO1say1p.jpg",
   },
   {
     name: "Eveline Hall",
+    character: "funny",
     profile_path:
       "https://image.tmdb.org/t/p/original/uPq4xUPiJIMW5rXF9AT0GrRqgJY.jpg",
   },
   {
     name: "Kamila Klamut",
+    character: "funny",
     profile_path:
       "https://image.tmdb.org/t/p/original/usWnHCzbADijULREZYSJ0qfM00y.jpg",
   },
   {
     name: "Caoilinn Springall",
+    character: "funny",
     profile_path:
       "https://image.tmdb.org/t/p/original/uZNtbPHowlBYo74U1qlTaRlrdiY.jpg",
   },
   {
     name: "Jan Kowalewski",
+    character: "funny",
     profile_path:
       "https://image.tmdb.org/t/p/original/snk6JiXOOoRjPtHU5VMoy6qbd32.jpg",
   },
   {
     name: "Pawel Wysocki",
+    character: "funny",
     profile_path:
       "https://image.tmdb.org/t/p/original/zmznPrQ9GSZwcOIUT0c3GyETwrP.jpg",
   },
   {
     name: "Simon Lööf",
+    character: "funny",
     profile_path:
       "https://image.tmdb.org/t/p/original/cbZrB8crWlLEDjVUoak8Liak6s.jpg",
   },
   {
     name: "Tomasz Cymerman",
+    character: "funny",
     profile_path:
       "https://image.tmdb.org/t/p/original/nTSPtzWu6deZTJtWXHUpACVznY4.jpg",
   },
