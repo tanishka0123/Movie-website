@@ -22,8 +22,12 @@ import Addshows from "./pages/admin/Addshows";
 import ListShows from "./pages/admin/ListShows";
 import ListBookings from "./pages/admin/ListBookings";
 import { Toaster } from "react-hot-toast";
+import { useAppContext } from "./context/AppContext";
+import { SignIn } from "@clerk/clerk-react";
 
 function App() {
+  const { user } = useAppContext();
+
   const location = useLocation();
   const dispatch = useDispatch();
   const { url } = useSelector((state) => state.home);
@@ -76,7 +80,18 @@ function App() {
         <Route path="/my-bookings" element={<MyBookings />} />
 
         {/* Admin Routes */}
-        <Route path="/admin" element={<Layout />}>
+        <Route
+          path="/admin/*"
+          element={
+            user ? (
+              <Layout />
+            ) : (
+              <div className="admin-not-signup">
+                <SignIn fallbackRedirectUrl={"/admin"} />
+              </div>
+            )
+          }
+        >
           <Route index element={<Dashboard />} />
           <Route path="add-shows" element={<Addshows />} />
           <Route path="list-shows" element={<ListShows />} />

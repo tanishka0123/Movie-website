@@ -18,7 +18,13 @@ await connectDB();
 // Middleware
 app.use(express.json());
 app.use(cors());
-app.use(clerkMiddleware());
+app.use(
+  clerkMiddleware({
+    debug: true, // Enable debug mode
+    secretKey: process.env.CLERK_SECRET_KEY,
+    publishableKey: process.env.CLERK_PUBLISHABLE_KEY,
+  })
+);
 
 // Routes
 app.get("/", (req, res) => res.send("Server is live"));
@@ -29,6 +35,6 @@ app.use("/api/admin", adminRouter);
 app.use("/api/user", userRouter);
 
 // Start the server
-app.listen(port, () =>
-  console.log(`Server is running on http://localhost:${port}`)
-);
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
