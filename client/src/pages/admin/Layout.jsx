@@ -1,11 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import AdminNavbar from "../../components/admin/AdminNavbar";
 import AdminSidebar from "../../components/admin/AdminSidebar";
 import { Outlet } from "react-router-dom";
-import "./style.scss"; 
+import "./style.scss";
+import { useAppContext } from "../../context/AppContext";
+import Spinner from "../../components/spinner/Spinner";
 
 function Layout() {
-  return (
+  const { isAdmin, fetchIsAdmin } = useAppContext();
+
+  useEffect(() => {
+    fetchIsAdmin();
+  },[]);
+  return isAdmin ? (
     <>
       <AdminNavbar />
       <div className="admin-container">
@@ -15,7 +22,7 @@ function Layout() {
         </div>
       </div>
     </>
-  );
+  ) : <Spinner></Spinner>;
 }
 
 export default Layout;

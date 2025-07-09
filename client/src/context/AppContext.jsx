@@ -11,6 +11,8 @@ export const AppProvider = ({ children }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [shows, setShows] = useState([]);
 
+  const image_base_url = import.meta.env.VITE__TMDB_IMAGE_BASE_URL;
+
   const navigate = useNavigate();
 
   const { user } = useUser();
@@ -85,7 +87,7 @@ export const AppProvider = ({ children }) => {
     }
   }, [user, isSignedIn]);
 
-  const value = { fetchIsAdmin, user, getToken, navigate, isAdmin, shows };
+  const value = { fetchIsAdmin, user, getToken, navigate, isAdmin, shows, image_base_url };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
