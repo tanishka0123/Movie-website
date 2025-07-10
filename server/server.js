@@ -31,13 +31,15 @@ app.use("/api/stripe", (req, res, next) => {
 // Middleware
 app.use(express.json());
 app.use(cors());
-app.use(
-  clerkMiddleware({
-    debug: true, // Enable debug mode
+app.use((req, res, next) => {
+  // Skip Clerk on webhook route
+  if (req.path.startsWith("/api/stripe")) return next();
+  return clerkMiddleware({
     secretKey: process.env.CLERK_SECRET_KEY,
     publishableKey: process.env.CLERK_PUBLISHABLE_KEY,
-  })
-);
+  })(req, res, next);
+});
+
 
 // Routes
 app.get("/", (req, res) => res.send("Server is live"));
