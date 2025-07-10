@@ -6,6 +6,7 @@ import { dateFormat } from "../../../lib/dateFormat";
 import "./style.scss";
 import { useAppContext } from "../../../context/AppContext";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 function MyBookings() {
   const currency = import.meta.env.VITE_CURRENCY;
@@ -67,7 +68,11 @@ function MyBookings() {
                 {currency}
                 {item.amount}
               </p>
-              {!item.isPaid && <button className="pay-now-btn">Pay Now</button>}
+              {!item.isPaid && (
+                <Link to={item.paymentLink} className="pay-now-btn">
+                  Pay Now
+                </Link>
+              )}
             </div>
             <div className="ticket-info">
               <p>
