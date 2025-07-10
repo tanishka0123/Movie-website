@@ -1,14 +1,11 @@
 import stripe from "stripe";
 import Booking from "../models/Booking.js";
+import Show from "../models/Show.js";
 // import { inngest } from "../inngest/index.js";
 
 export const stripeWebhooks = async (request, response) => {
-  console.log("🔵 Webhook received at:", new Date().toISOString());
-  
   const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
   const sig = request.headers["stripe-signature"];
-
-  console.log("🔵 Stripe signature:", sig ? "Present" : "Missing");
 
   let event;
 
@@ -18,84 +15,207 @@ export const stripeWebhooks = async (request, response) => {
       sig,
       process.env.STRIPE_WEBHOOK_SECRET
     );
-    console.log("✅ Webhook signature verified successfully");
-    console.log("🔵 Event type:", event.type);
-    console.log("🔵 Event ID:", event.id);
   } catch (error) {
-    console.error("❌ Webhook signature verification failed:", error.message);
+    console.error("Webhook signature verification failed:", error.message);
     return response.status(400).send(`Webhook Error: ${error.message}`);
   }
 
+  // Respond immediately to Stripe
+  response.json({ received: true });
+
+  // Process the event asynchronously
   try {
-    console.log("🔵 Processing event type:", event.type);
-    
-    switch (event.type) {
-      case "payment_intent.succeeded": {
-        console.log("🔵 Processing payment_intent.succeeded");
-        
-        const paymentIntent = event.data.object;
-        console.log("🔵 Payment Intent ID:", paymentIntent.id);
-        console.log("🔵 Payment Intent Amount:", paymentIntent.amount);
-        
-        console.log("🔵 Fetching checkout sessions...");
-        const sessionList = await stripeInstance.checkout.sessions.list({
-          payment_intent: paymentIntent.id,
-        });
-
-        console.log("🔵 Found sessions:", sessionList.data.length);
-        
-        if (sessionList.data.length === 0) {
-          console.error("❌ No checkout session found for payment intent:", paymentIntent.id);
-          break;
-        }
-
-        const session = sessionList.data[0];
-        console.log("🔵 Session ID:", session.id);
-        console.log("🔵 Session metadata:", session.metadata);
-        
-        const { bookingId } = session.metadata;
-        console.log("🔵 Booking ID from metadata:", bookingId);
-
-        if (!bookingId) {
-          console.error("❌ No bookingId found in session metadata");
-          break;
-        }
-
-        console.log("🔵 Updating booking:", bookingId);
-        
-        const updatedBooking = await Booking.findByIdAndUpdate(bookingId, {
-          isPaid: true,
-          paymentLink: "",
-        });
-
-        if (!updatedBooking) {
-          console.error("❌ Booking not found in database:", bookingId);
-          break;
-        }
-
-        console.log("✅ Booking updated successfully:", bookingId);
-        console.log("🔵 Updated booking details:", {
-          id: updatedBooking._id,
-          isPaid: updatedBooking.isPaid,
-          amount: updatedBooking.amount
-        });
-
-        // Send booking confirmation email
-        console.log("🔵 TODO: Send booking confirmation email");
-
-        break;
-      }
-
-      default:
-        console.log("🔵 Unhandled event type:", event.type);
-    }
-    
-    console.log("✅ Webhook processed successfully");
-    response.json({ received: true });
-    
-  } catch (err) {
-    console.error("❌ Webhook processing error:", err);
-    console.error("❌ Error stack:", err.stack);
-    response.status(500).send("Internal Server Error");
+    await processWebhookEvent(event, stripeInstance);
+  } catch (error) {
+    console.error("Error processing webhook event:", error);
   }
 };
+
+async function processWebhookEvent(event, stripeInstance) {
+  console.log(`Processing webhook event: ${event.type} - ${event.id}`);
+  
+  switch (event.type) {
+    case "payment_intent.succeeded": {
+      const paymentIntent = event.data.object;
+      console.log(`Payment intent succeeded: ${paymentIntent.id}`);
+      
+      try {
+        // Find the checkout session associated with this payment intent
+        const sessions = await stripeInstance.checkout.sessions.list({
+          payment_intent: paymentIntent.id,
+          limit: 1
+        });
+
+        if (sessions.data.length === 0) {
+          console.error(`No checkout session found for payment intent: ${paymentIntent.id}`);
+          return;
+        }
+
+        const session = sessions.data[0];
+        const { bookingId } = session.metadata;
+
+        if (!bookingId) {
+          console.error(`No bookingId found in session metadata for payment intent: ${paymentIntent.id}`);
+          return;
+        }
+
+        // Find and update the booking using the new confirmPayment method
+        const booking = await Booking.findById(bookingId);
+        
+        if (!booking) {
+          console.error(`Booking not found: ${bookingId}`);
+          return;
+        }
+
+        if (booking.isPaid) {
+          console.log(`Booking ${bookingId} is already paid`);
+          return;
+        }
+
+        // Use the new confirmPayment method
+        await booking.confirmPayment(paymentIntent.id);
+
+        console.log(`Booking confirmed successfully: ${bookingId}`);
+
+        // TODO: Send booking confirmation email
+        // await sendBookingConfirmationEmail(booking);
+
+      } catch (error) {
+        console.error("Error processing payment_intent.succeeded:", error);
+        throw error;
+      }
+      break;
+    }
+
+    case "checkout.session.completed": {
+      const session = event.data.object;
+      console.log(`Checkout session completed: ${session.id}`);
+      
+      try {
+        const { bookingId } = session.metadata;
+
+        if (!bookingId) {
+          console.error(`No bookingId found in session metadata: ${session.id}`);
+          return;
+        }
+
+        // Update booking with stripe session ID
+        await Booking.findByIdAndUpdate(bookingId, {
+          stripeSessionId: session.id
+        });
+
+        console.log(`Stripe session ID updated for booking: ${bookingId}`);
+
+      } catch (error) {
+        console.error("Error processing checkout.session.completed:", error);
+        throw error;
+      }
+      break;
+    }
+
+    case "checkout.session.expired": {
+      const session = event.data.object;
+      console.log(`Checkout session expired: ${session.id}`);
+      
+      try {
+        const { bookingId } = session.metadata;
+
+        if (!bookingId) {
+          console.error(`No bookingId found in expired session metadata: ${session.id}`);
+          return;
+        }
+
+        const booking = await Booking.findById(bookingId).populate('show');
+        
+        if (!booking) {
+          console.error(`Booking not found for expired session: ${bookingId}`);
+          return;
+        }
+
+        if (booking.isPaid) {
+          console.log(`Booking ${bookingId} is already paid, ignoring expiration`);
+          return;
+        }
+
+        // Mark booking as expired and release seats
+        booking.status = 'expired';
+        await booking.save();
+
+        // Release the occupied seats
+        await releaseSeats(booking);
+
+        console.log(`Booking expired and seats released: ${bookingId}`);
+
+      } catch (error) {
+        console.error("Error processing checkout.session.expired:", error);
+        throw error;
+      }
+      break;
+    }
+
+    case "payment_intent.payment_failed": {
+      const paymentIntent = event.data.object;
+      console.log(`Payment failed: ${paymentIntent.id}`);
+      
+      try {
+        // Find the checkout session
+        const sessions = await stripeInstance.checkout.sessions.list({
+          payment_intent: paymentIntent.id,
+          limit: 1
+        });
+
+        if (sessions.data.length > 0) {
+          const session = sessions.data[0];
+          const { bookingId } = session.metadata;
+
+          if (bookingId) {
+            console.log(`Payment failed for booking: ${bookingId}`);
+            // You might want to send a notification to the user
+            // but don't immediately expire the booking as they might retry
+          }
+        }
+
+      } catch (error) {
+        console.error("Error processing payment_intent.payment_failed:", error);
+        throw error;
+      }
+      break;
+    }
+
+    default:
+      console.log(`Unhandled event type: ${event.type}`);
+  }
+}
+
+// Helper function to release seats when booking expires or fails
+async function releaseSeats(booking) {
+  try {
+    if (!booking.show) {
+      console.error(`No show found for booking: ${booking._id}`);
+      return;
+    }
+
+    const show = await Show.findById(booking.show);
+    
+    if (!show) {
+      console.error(`Show not found: ${booking.show}`);
+      return;
+    }
+
+    // Release each booked seat
+    booking.bookedSeats.forEach(seat => {
+      if (show.occupiedSeats[seat] === booking.user) {
+        delete show.occupiedSeats[seat];
+      }
+    });
+
+    show.markModified('occupiedSeats');
+    await show.save();
+
+    console.log(`Released ${booking.bookedSeats.length} seats for booking: ${booking._id}`);
+    
+  } catch (error) {
+    console.error('Error releasing seats:', error);
+    throw error;
+  }
+}
