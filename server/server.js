@@ -15,9 +15,18 @@ const app = express();
 const port = 3000;
 
 await connectDB();
+// Add after connectDB()
+console.log("🔵 Environment check:");
+console.log("🔵 STRIPE_SECRET_KEY:", process.env.STRIPE_SECRET_KEY ? "Present" : "Missing");
+console.log("🔵 STRIPE_WEBHOOK_SECRET:", process.env.STRIPE_WEBHOOK_SECRET ? "Present" : "Missing");
 
 //stripe webhook route
-app.use("/api/stripe", express.raw({ type: "application/json" }), stripeWebhooks);
+app.use("/api/stripe", (req, res, next) => {
+  console.log("🔵 Stripe webhook endpoint hit");
+  console.log("🔵 Method:", req.method);
+  console.log("🔵 Headers:", req.headers);
+  next();
+}, express.raw({ type: "application/json" }), stripeWebhooks);
 
 // Middleware
 app.use(express.json());
