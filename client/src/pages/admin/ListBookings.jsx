@@ -1,22 +1,38 @@
 import { useEffect, useState } from "react";
-import { dummyBookingData } from "../TicketBook/DummyData";
 import Spinner from "../../components/spinner/Spinner";
 import { dateFormat } from "../../lib/dateFormat";
 import "./style.scss";
+import { useAppContext } from "../../context/AppContext";
+import axios from "axios";
 
 function ListBookings() {
+  const { getToken, user } = useAppContext();
   const currency = import.meta.env.VITE_CURRENCY;
   const [bookings, setBookings] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchBookingData = () => {
-    setBookings(dummyBookingData);
-    setIsLoading(false);
+  const fetchBookingData = async () => {
+    try {
+      const { data } = await axios.get(
+        "http://localhost:3000/api/admin/all-bookings",
+        {
+          headers: {
+            Authorization: `Bearer ${await getToken()}`,
+          },
+        }
+      );
+      setBookings(data.bookings);
+      setIsLoading(false);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
-    fetchBookingData();
-  }, []);
+    if (user) {
+      fetchBookingData();
+    }
+  }, [user]);
 
   return !isLoading ? (
     <div className="listbookings-wrapper">
@@ -57,7 +73,9 @@ function ListBookings() {
       </div>
     </div>
   ) : (
-    <Spinner />
+    <div className="spinner-fullscreen">
+      <Spinner />
+    </div>
   );
 }
 

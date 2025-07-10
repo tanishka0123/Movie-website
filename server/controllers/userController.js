@@ -1,10 +1,10 @@
 import Booking from "../models/Booking.js";
 
 //api controller function to get user bookings
-export const getUserBookings = async () => {
+export const getUserBookings = async (req, res) => {
   try {
-    const user = req.auth().userId;
-    const bookings = await Booking.find({ user })
+    const { userId } = req.auth();
+    const bookings = await Booking.find({ user: userId })
       .populate({
         path: "show",
         populate: {
@@ -18,5 +18,3 @@ export const getUserBookings = async () => {
     res.json({ success: false, message: error.message });
   }
 };
-
-

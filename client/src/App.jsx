@@ -24,6 +24,7 @@ import ListBookings from "./pages/admin/ListBookings";
 import { Toaster } from "react-hot-toast";
 import { useAppContext } from "./context/AppContext";
 import { SignIn } from "@clerk/clerk-react";
+import Spinner from "./components/spinner/Spinner";
 
 function App() {
   const { user } = useAppContext();
@@ -77,6 +78,7 @@ function App() {
         <Route path="/book" element={<TicketBook />} />
         <Route path="/book/:movieId" element={<BookMovie />} />
         <Route path="/book/:id/:date" element={<SeatBook />} />
+        <Route path="loading/:nextUrl" element={<Spinner initial={true} />} />
         <Route path="/my-bookings" element={<MyBookings />} />
 
         {/* Admin Routes */}

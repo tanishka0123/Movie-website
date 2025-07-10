@@ -11,7 +11,7 @@ function Layout() {
 
   useEffect(() => {
     fetchIsAdmin();
-  },[]);
+  }, []);
   return isAdmin ? (
     <>
       <AdminNavbar />
@@ -22,7 +22,11 @@ function Layout() {
         </div>
       </div>
     </>
-  ) : <Spinner></Spinner>;
+  ) : (
+    <div className="spinner-fullscreen">
+      <Spinner />
+    </div>
+  );
 }
 
 export default Layout;

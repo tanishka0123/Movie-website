@@ -176,6 +176,9 @@
           color: white;
           border-color: var(--pink);
         }
+        &.occupied{
+          opacity: 0.33;
+        }
       }
     }
   }

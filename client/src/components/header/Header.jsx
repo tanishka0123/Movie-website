@@ -8,6 +8,7 @@ import "./header.scss";
 import { IoTicketSharp } from "react-icons/io5";
 import ContentWrapper from "../contentWrapper/ContentWrapper";
 import logo from "../../assets/movix-logo.svg";
+import { useAppContext } from "../../context/AppContext";
 
 const Header = () => {
   const [show, setShow] = useState("top");
@@ -17,6 +18,8 @@ const Header = () => {
   const [showSearch, setShowSearch] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
+
+  const { isAdmin } = useAppContext();
 
   const { user } = useUser();
   const { openSignIn } = useClerk();
@@ -92,6 +95,11 @@ const Header = () => {
             <li className="menuItem" onClick={() => navigationHandler("tv")}>
               TV Shows
             </li>
+            {isAdmin && (
+              <li className="menuItem" onClick={() => navigate("/admin")}>
+                Dashboard
+              </li>
+            )}
           </ul>
         </div>
 

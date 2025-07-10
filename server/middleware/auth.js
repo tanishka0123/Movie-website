@@ -28,7 +28,7 @@ export const protectAdmin = async (req, res, next) => {
         Buffer.from(payload, "base64url").toString()
       );
       decoded = decodedPayload;
-      console.log("Decoded JWT payload:", decoded);
+      
     } catch (e) {
       console.log("Could not decode JWT:", e.message);
       return res.status(401).json({
@@ -70,7 +70,6 @@ export const protectAdmin = async (req, res, next) => {
     }
 
     if (user?.privateMetadata?.role !== "admin") {
-      console.log("User is not admin:", user?.privateMetadata?.role);
       return res.status(403).json({
         success: false,
         message: "Not authorized as admin",

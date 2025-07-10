@@ -224,7 +224,9 @@ function Addshows() {
       </div>
     </>
   ) : (
-    <Spinner />
+    <div className="spinner-fullscreen">
+      <Spinner />
+    </div>
   );
 }
 

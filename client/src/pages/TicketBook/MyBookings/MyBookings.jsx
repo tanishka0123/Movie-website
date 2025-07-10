@@ -3,21 +3,40 @@ import { dummyBookingData } from "../DummyData";
 import Spinner from "../../../components/spinner/Spinner";
 import timeFormat from "../../../lib/timeFormat";
 import { dateFormat } from "../../../lib/dateFormat";
-import "./style.scss"; 
+import "./style.scss";
+import { useAppContext } from "../../../context/AppContext";
+import axios from "axios";
 
 function MyBookings() {
   const currency = import.meta.env.VITE_CURRENCY;
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { getToken, user, image_base_url } = useAppContext();
 
   const getMyBookings = async () => {
-    setBookings(dummyBookingData);
+    try {
+      const { data } = await axios.get(
+        "http://localhost:3000/api/user/bookings",
+        {
+          headers: {
+            Authorization: `Bearer ${await getToken()}`,
+          },
+        }
+      );
+      if (data.success) {
+        setBookings(data.bookings);
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
     setLoading(false);
   };
 
   useEffect(() => {
-    getMyBookings();
-  }, []);
+    if (user) {
+      getMyBookings();
+    }
+  }, [user]);
 
   return !loading ? (
     <div className="mybookings-container">
@@ -26,17 +45,19 @@ function MyBookings() {
 
       <h1 className="booking-heading">My Bookings</h1>
 
-      {bookings.map((item, index) => (
+      {bookings?.map((item, index) => (
         <div className="booking-card" key={index}>
           <div className="booking-info">
             <img
-              src={item.show.movie.poster_path}
+              src={image_base_url + item.show.movie.poster_path}
               alt=""
               className="booking-poster"
             />
             <div className="booking-details">
               <p className="movie-title">{item.show.movie.title}</p>
-              <p className="movie-runtime">{timeFormat(item.show.movie.runtime)}</p>
+              <p className="movie-runtime">
+                {timeFormat(item.show.movie.runtime)}
+              </p>
               <p className="movie-date">{dateFormat(item.show.showDateTime)}</p>
             </div>
           </div>
@@ -46,9 +67,7 @@ function MyBookings() {
                 {currency}
                 {item.amount}
               </p>
-              {!item.isPaid && (
-                <button className="pay-now-btn">Pay Now</button>
-              )}
+              {!item.isPaid && <button className="pay-now-btn">Pay Now</button>}
             </div>
             <div className="ticket-info">
               <p>

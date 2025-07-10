@@ -48,7 +48,7 @@ export const AppProvider = ({ children }) => {
       }
     } catch (error) {
       setIsAdmin(false);
-
+      console.log(error.response?.status)
       if (error.response?.status === 401) {
         if (location.pathname.startsWith("/admin")) {
           navigate("/");

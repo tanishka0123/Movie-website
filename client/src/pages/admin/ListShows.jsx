@@ -1,28 +1,28 @@
 import React, { useEffect, useState } from "react";
-import { dummyShowsData } from "../TicketBook/DummyData";
 import Spinner from "../../components/spinner/Spinner";
 import { dateFormat } from "../../lib/dateFormat";
 import "./style.scss";
+import { useAppContext } from "../../context/AppContext";
+import axios from "axios";
 
 function ListShows() {
+  const { getToken, user } = useAppContext();
+
   const currency = import.meta.env.VITE_CURRENCY;
   const [shows, setShows] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const getAllShows = async () => {
     try {
-      setShows([
+      const { data } = await axios.get(
+        "http://localhost:3000/api/admin/all-shows",
         {
-          movie: dummyShowsData[0],
-          showDateTime: "2025-06-30T02:30:00.000Z",
-          showPrice: 59,
-          occupiedSeats: {
-            A1: "user_1",
-            B1: "user_2",
-            C1: "user_3",
+          headers: {
+            Authorization: `Bearer ${await getToken()}`,
           },
-        },
-      ]);
+        }
+      );
+      setShows(data.shows);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -30,8 +30,10 @@ function ListShows() {
   };
 
   useEffect(() => {
-    getAllShows();
-  }, []);
+    if (user) {
+      getAllShows();
+    }
+  }, [user]);
 
   return !loading ? (
     <>
@@ -69,7 +71,9 @@ function ListShows() {
       </div>
     </>
   ) : (
-    <Spinner />
+    <div className="spinner-fullscreen">
+      <Spinner />
+    </div>
   );
 }
 

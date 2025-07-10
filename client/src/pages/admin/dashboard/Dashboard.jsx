@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { dummyDashboardData } from "../../TicketBook/DummyData";
 import { FaChartLine } from "react-icons/fa6";
 import { FaHandHoldingDollar } from "react-icons/fa6";
 import { TfiVideoClapper } from "react-icons/tfi";
@@ -8,8 +7,13 @@ import Spinner from "../../../components/spinner/Spinner";
 import "./style.scss";
 import { dateFormat } from "../../../lib/dateFormat";
 import CircleRating from "../../../components/circleRating/CircleRating";
+import { useAppContext } from "../../../context/AppContext";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 function Dashboard() {
+  const { getToken, user, image_base_url } = useAppContext();
+
   const currency = import.meta.env.VITE_CURRENCY;
   const [dashboardData, setDashboardData] = useState({
     totalBookings: 0,
@@ -41,12 +45,30 @@ function Dashboard() {
     },
   ];
   const fetchDashBoardData = async () => {
-    setDashboardData(dummyDashboardData);
-    setLoading(false);
+    try {
+      const { data } = await axios.get(
+        "http://localhost:3000/api/admin/dashboard",
+        {
+          headers: {
+            Authorization: `Bearer ${await getToken()}`,
+          },
+        }
+      );
+      if (data.success) {
+        setDashboardData(data.dashboardData);
+        setLoading(false);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error("Error fetching dashboard data");
+    }
   };
   useEffect(() => {
-    fetchDashBoardData();
-  }, []);
+    if (user) {
+      fetchDashBoardData();
+    }
+  }, [user]);
   return !loading ? (
     <div className="dashboard">
       <h1 className="admin-title">Admin Dashboard</h1>
@@ -69,7 +91,7 @@ function Dashboard() {
           return (
             <div className="active-shows">
               <div key={show._id} className="show-card">
-                <img src={show.movie.poster_path} alt="" />
+                <img src={image_base_url + show.movie.poster_path} alt="" />
                 <CircleRating rating={show.movie.vote_average.toFixed(1)} />
                 <p className="price">
                   {currency} {show.showPrice}
@@ -85,7 +107,9 @@ function Dashboard() {
       </div>
     </div>
   ) : (
-    <Spinner></Spinner>
+    <div className="spinner-fullscreen">
+      <Spinner />
+    </div>
   );
 }
 

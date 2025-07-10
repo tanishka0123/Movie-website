@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { dummyDateTimeData, dummyShowsData } from "../DummyData";
 import "./style.scss";
 import { FaClockRotateLeft } from "react-icons/fa6";
-
 import toast from "react-hot-toast";
 import { FaArrowRight } from "react-icons/fa";
 import isoTimeFormat from "../../../lib/IsoTime";
+import { useAppContext } from "../../../context/AppContext";
+import axios from "axios";
 
 function SeatBook() {
   const groupRows = [
@@ -20,13 +20,20 @@ function SeatBook() {
   const [selectedSeat, setSelectedSeat] = useState([]);
   const [selectedTime, setSelectedTime] = useState(null);
   const [show, setShow] = useState(null);
+  const [occupiedSeats, setOccupiedSeats] = useState([]);
 
   const nav = useNavigate();
 
+  const { getToken, user } = useAppContext();
+
   const getShow = async () => {
-    const show = dummyShowsData.find((show) => show._id === id);
-    if (show) {
-      setShow(show);
+    try {
+      const { data } = await axios.get(`http://localhost:3000/api/show/${id}`);
+      if (data.success) {
+        setShow(data);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -37,6 +44,11 @@ function SeatBook() {
     if (!selectedSeat.includes(seatId) && selectedSeat.length > 4) {
       return toast.error("You can only select upto 5 seats");
     }
+
+    if (occupiedSeats.includes(seatId)) {
+      return toast.error("This seat is already booked");
+    }
+
     setSelectedSeat((prev) =>
       prev.includes(seatId)
         ? prev.filter((seat) => seat != seatId)
@@ -55,7 +67,7 @@ function SeatBook() {
               onClick={() => handleSeatClick(seatId)}
               className={`singleSeat ${
                 selectedSeat.includes(seatId) && "primary"
-              } `}
+              } ${occupiedSeats.includes(seatId) && "occupied"}`}
             >
               {seatId}
             </button>
@@ -64,9 +76,83 @@ function SeatBook() {
       </div>
     </div>
   );
+
+  const getOccupiedSeats = async () => {
+    try {
+      const { data } = await axios.get(
+        `http://localhost:3000/api/booking/seats/${selectedTime.showId}`
+      );
+      if (data.success) {
+        setOccupiedSeats(data.occupiedSeats);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const bookTickets = async () => {
+  try {
+
+    if (!user) return toast.error("Please login to proceed");
+    if (!selectedTime || !selectedSeat.length) {
+      return toast.error("Please select time and seats");
+    }
+
+    const token = await getToken();
+
+    const { data } = await axios.post(
+      `http://localhost:3000/api/booking/create`,
+      { showId: selectedTime.showId, selectedSeats: selectedSeat },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    console.log("API Response:", data);
+
+    if (data.success) {
+
+      if (data.url) {
+        // Show loading message
+        toast.loading("Redirecting to payment...", { duration: 2000 });
+
+        window.location.href = data.url;
+      } else {
+        console.log("No URL in response");
+        toast.error("Payment URL not received");
+      }
+    } else {
+      console.log("Booking failed:", data.message);
+      toast.error(data.message || "Booking failed");
+    }
+  } catch (error) {
+    console.error("Frontend booking error:", error);
+    console.error("Error response:", error.response?.data);
+    
+    if (error.response?.data?.message) {
+      toast.error(error.response.data.message);
+    } else if (error.message) {
+      toast.error(error.message);
+    } else {
+      toast.error("Something went wrong. Please try again.");
+    }
+  }
+};
+
   useEffect(() => {
     getShow();
   }, []);
+
+  useEffect(() => {
+    if (selectedTime) {
+      getOccupiedSeats();
+    }
+  }, [selectedTime]);
 
   return (
     <div className="topContainer">
@@ -76,7 +162,7 @@ function SeatBook() {
         <div className="timings">
           <p className="heading">Available Timings</p>
           <div className="timeSlots">
-            {dummyDateTimeData[date].map((item) => (
+            {show?.dateTime[date].map((item) => (
               <div
                 key={item.time}
                 onClick={() => setSelectedTime(item)}
@@ -106,12 +192,12 @@ function SeatBook() {
               ))}
             </div>
           </div>
-          <button className="btn" onClick={() => nav("/my-bookings")}>
+          <button className="btn" onClick={bookTickets}>
             Proceed to Checkout <FaArrowRight className="icon" />
           </button>
         </div>
       </div>
-      <div className="blur-circle2"/>
+      <div className="blur-circle2" />
     </div>
   );
 }
