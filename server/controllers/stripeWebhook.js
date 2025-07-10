@@ -1,5 +1,5 @@
 import stripe from "stripe";
-import Booking from "../models/Booking.js"; // Adjust path as needed
+import Booking from "../models/Booking.js";
 
 const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -12,7 +12,6 @@ export const stripeWebhooks = async (req, res) => {
   let event;
 
   try {
-    // Get raw body
     const buf = Buffer.from(req.body);
     event = stripeInstance.webhooks.constructEvent(
       buf,
@@ -28,32 +27,108 @@ export const stripeWebhooks = async (req, res) => {
 
   try {
     switch (event.type) {
+      case "checkout.session.completed": {
+        const session = event.data.object;
+        
+        console.log("🎯 Checkout session completed:", session.id);
+        console.log("💰 Payment status:", session.payment_status);
+        console.log("📊 Session metadata:", session.metadata);
+        
+        // Only process if payment was successful
+        if (session.payment_status === "paid") {
+          const { bookingId } = session.metadata;
+          
+          console.log("💳 Payment completed for session:", session.id);
+          console.log("📝 Updating booking:", bookingId);
+          
+          if (bookingId) {
+            try {
+              const updatedBooking = await Booking.findByIdAndUpdate(
+                bookingId,
+                {
+                  isPaid: true,
+                  paymentLink: "",
+                  stripeSessionId: session.id,
+                  paymentIntentId: session.payment_intent,
+                },
+                { new: true }
+              );
+              
+              if (updatedBooking) {
+                console.log("✅ Booking updated successfully:", bookingId);
+                console.log("📋 Updated booking isPaid:", updatedBooking.isPaid);
+              } else {
+                console.log("❌ Booking not found:", bookingId);
+              }
+            } catch (updateError) {
+              console.log("❌ Error updating booking:", updateError.message);
+            }
+          } else {
+            console.log("❌ No bookingId found in session metadata");
+          }
+        } else {
+          console.log("⚠️ Payment not completed, status:", session.payment_status);
+        }
+        break;
+      }
+
       case "payment_intent.succeeded": {
         const paymentIntent = event.data.object;
-        console.log("💳 Payment succeeded:", paymentIntent.id);
-
-        const sessionList = await stripeInstance.checkout.sessions.list({
-          payment_intent: paymentIntent.id,
-        });
-
-        if (sessionList.data.length > 0) {
-          const session = sessionList.data[0];
-          const { bookingId } = session.metadata;
-
-          console.log("📝 Updating booking:", bookingId);
-
-          await Booking.findByIdAndUpdate(bookingId, {
-            isPaid: true,
-            paymentLink: "",
+        console.log("💳 Payment intent succeeded:", paymentIntent.id);
+        
+        // Fallback: Try to find booking by payment intent if session webhook fails
+        try {
+          const sessionList = await stripeInstance.checkout.sessions.list({
+            payment_intent: paymentIntent.id,
+            limit: 1
           });
 
-          console.log("✅ Booking updated successfully");
+          if (sessionList.data.length > 0) {
+            const session = sessionList.data[0];
+            const { bookingId } = session.metadata;
+
+            if (bookingId) {
+              // Check if booking is already marked as paid
+              const existingBooking = await Booking.findById(bookingId);
+              
+              if (existingBooking && !existingBooking.isPaid) {
+                console.log("📝 Fallback: Updating booking via payment_intent:", bookingId);
+                
+                await Booking.findByIdAndUpdate(bookingId, {
+                  isPaid: true,
+                  paymentLink: "",
+                  stripeSessionId: session.id,
+                  paymentIntentId: paymentIntent.id,
+                });
+
+                console.log("✅ Fallback: Booking updated successfully");
+              } else {
+                console.log("ℹ️ Booking already processed or not found");
+              }
+            }
+          }
+        } catch (fallbackError) {
+          console.log("❌ Fallback processing failed:", fallbackError.message);
+        }
+        break;
+      }
+
+      case "checkout.session.expired": {
+        const session = event.data.object;
+        const { bookingId } = session.metadata;
+        
+        console.log("⏰ Session expired for booking:", bookingId);
+        
+        if (bookingId) {
+          // Optionally handle expired sessions
+          // You might want to mark the booking as expired or clean up
+          console.log("📝 Handling expired session for booking:", bookingId);
         }
         break;
       }
 
       default:
-        console.log("Unhandled event type:", event.type);
+        console.log("ℹ️ Unhandled event type:", event.type);
     }
 
     res.status(200).json({ received: true });
