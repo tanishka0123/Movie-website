@@ -67,6 +67,11 @@ function MyBookings() {
                 {currency}
                 {item.amount}
               </p>
+              {!item.isPaid && (
+                <Link to={item.paymentLink} className="pay-now-btn">
+                  Pay Now
+                </Link>
+              )}
             </div>
             <div className="ticket-info">
               <p>

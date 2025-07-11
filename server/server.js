@@ -9,18 +9,15 @@ import showRouter from "./routes/showRoutes.js";
 import bookingRouter from "./routes/bookingRoutes.js";
 import adminRouter from "./routes/adminRoutes.js";
 import userRouter from "./routes/userRoutes.js";
-import { razorpayWebhook } from "./controllers/razorWebhook.js";
+import { stripeWebhooks } from "./controllers/stripeWebhook.js";
 
 const app = express();
 const port = 3000;
 
 await connectDB();
 
-app.post(
-  "/api/razorpay/webhook",
-  express.raw({ type: "application/json" }),
-  razorpayWebhook
-);
+//stripe webhook route
+app.use("/api/stripe", express.raw({ type: "application/json" }), stripeWebhooks);
 
 // Middleware
 app.use(express.json());

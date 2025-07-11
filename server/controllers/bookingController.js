@@ -1,88 +1,103 @@
 import Booking from "../models/Booking.js";
-import Show from "../models/Show.js";
-import Razorpay from "razorpay";
+import Show from "../models/Show.js"
+import stripe from 'stripe'
 
-// Setup Razorpay instance
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_API_KEY,
-  key_secret: process.env.RAZORPAY_API_SECRET,
-});
+// Function to check availability of selected seats for a movie
+const checkSeatsAvailability = async (showId, selectedSeats) =>{
+    try {
+        const showData = await Show.findById(showId)
+        if(!showData) return false;
 
-const checkSeatsAvailability = async (showId, selectedSeats) => {
-  try {
-    const showData = await Show.findById(showId);
-    if (!showData) return false;
+        const occupiedSeats = showData.occupiedSeats;
 
-    const occupiedSeats = showData.occupiedSeats;
-    const isAnySeatTaken = selectedSeats.some((seat) => occupiedSeats[seat]);
-    return !isAnySeatTaken;
-  } catch (error) {
-    console.log(error.message);
-    return false;
-  }
-};
+        const isAnySeatTaken = selectedSeats.some(seat => occupiedSeats[seat]);
 
-export const createBooking = async (req, res) => {
-  try {
-    const { userId } = req.auth();
-    const { showId, selectedSeats } = req.body;
-    const { origin } = req.headers;
-
-    const isAvailable = await checkSeatsAvailability(showId, selectedSeats);
-    if (!isAvailable) {
-      return res.json({
-        success: false,
-        message: "Selected Seats are not available.",
-      });
+        return !isAnySeatTaken;
+    } catch (error) {
+        console.log(error.message);
+        return false;
     }
+}
 
-    const showData = await Show.findById(showId).populate("movie");
-    const amount = showData.showPrice * selectedSeats.length * 100; // in paise
+export const createBooking = async (req, res)=>{
+    try {
+        const {userId} = req.auth();
+        const {showId, selectedSeats} = req.body;
+        const {origin} = req.headers;
 
-    const booking = await Booking.create({
-      user: userId,
-      show: showId,
-      amount: amount / 100,
-      bookedSeats: selectedSeats,
-    });
+        // Check if the seat is available for the selected show
+        const isAvailable = await checkSeatsAvailability(showId, selectedSeats)
+        if(!isAvailable){
+            return res.json({success: false, message: "Selected Seats are not available."})
+        } 
 
-    // Create Razorpay order
-    const razorOrder = await razorpay.orders.create({
-      amount,
-      currency: "INR",
-      receipt: booking._id.toString(),
-      payment_capture: 1,
-      notes: {
-        showId,
-        bookingId: booking._id.toString(),
-      },
-    });
+        // Get the show details
+        const showData = await Show.findById(showId).populate('movie');
 
-    // Save order id in DB (optional)
-    booking.paymentLink = `https://rzp.io/i/${razorOrder.id}`; // optional visualization
-    await booking.save();
+        // Create a new booking
+        const booking = await Booking.create({
+            user: userId,
+            show: showId,
+            amount: showData.showPrice * selectedSeats.length,
+            bookedSeats: selectedSeats
+        })
 
-    // You’ll now redirect to frontend which sends this to Razorpay Checkout
-    res.json({
-      success: true,
-      url: `${origin}/api/booking/pay/${booking._id}`,
-    });
-  } catch (error) {
-    console.log(error.message);
-    res.json({ success: false, message: error.message });
-  }
-};
+        selectedSeats.map((seat)=>{
+            showData.occupiedSeats[seat] = userId;
+        })
 
-export const getOccupiedSeats = async (req, res) => {
-  try {
-    const { showId } = req.params;
-    const showData = await Show.findById(showId);
+        showData.markModified('occupiedSeats');
 
-    const occupiedSeats = Object.keys(showData.occupiedSeats);
+        await showData.save();
 
-    res.json({ success: true, occupiedSeats });
-  } catch (error) {
-    console.log(error.message);
-    res.json({ success: false, message: error.message });
-  }
-};
+        // Stripe Gateway Initialize
+        const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY)
+
+        // Creating line items to for stripe
+        const line_items = [{
+            price_data: {
+                currency: 'usd',
+                product_data:{
+                    name: showData.movie.title
+                },
+                unit_amount: Math.floor(booking.amount) * 100
+            },
+            quantity: 1
+        }]
+
+        const session = await stripeInstance.checkout.sessions.create({
+            success_url: `${origin}/loading/my-bookings`,
+            cancel_url: `${origin}/my-bookings`,
+            line_items: line_items,
+            mode: "payment",
+            metadata: {
+                bookingId: booking._id.toString()
+            },
+            expires_at: Math.floor(Date.now() / 1000) + 30 * 60, // Expires in 30 minutes
+        })
+
+        booking.paymentLink = session.url
+        await booking.save()
+
+        res.json({success: true, url: session.url})
+
+    } catch (error) {
+        console.log(error.message);
+        res.json({success: false, message: error.message})
+    }
+}
+
+export const getOccupiedSeats = async (req, res)=>{
+    try {
+        const {showId} = req.params;
+        const showData = await Show.findById(showId)
+
+        const occupiedSeats = Object.keys(showData.occupiedSeats)
+
+        res.json({success: true, occupiedSeats})
+
+    } catch (error) {
+        console.log(error.message);
+        res.json({success: false, message: error.message})
+    }
+}
