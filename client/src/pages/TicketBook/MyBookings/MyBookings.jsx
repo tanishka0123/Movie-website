@@ -12,11 +12,12 @@ function MyBookings() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const { getToken, user, image_base_url } = useAppContext();
+  const base_url = import.meta.env.VITE_BASE_URL
 
   const getMyBookings = async () => {
     try {
       const { data } = await axios.get(
-        "http://localhost:3000/api/user/bookings",
+        `${base_url}/api/user/bookings`,
         {
           headers: {
             Authorization: `Bearer ${await getToken()}`,

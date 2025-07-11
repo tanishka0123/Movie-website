@@ -19,11 +19,12 @@ function Addshows() {
   const [dateTimeInput, setDateTimeInput] = useState("");
   const [showPrice, setShowPrice] = useState("");
   const [addingShow, setAddingShow] = useState(false);
+  const base_url = import.meta.env.VITE_BASE_URL
 
   const fetchNowPlayingMovies = async () => {
     try {
       const { data } = await axios.get(
-        "http://localhost:3000/api/show/now-playing",
+        `${base_url}/api/show/now-playing`,
         {
           headers: {
             Authorization: `Bearer ${await getToken()}`,
@@ -87,7 +88,7 @@ function Addshows() {
       };
 
       const { data } = await axios.post(
-        "http://localhost:3000/api/show/add",
+        `${base_url}/api/show/add`,
         payload,
         {
           headers: {

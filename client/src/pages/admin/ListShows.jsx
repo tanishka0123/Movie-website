@@ -11,11 +11,12 @@ function ListShows() {
   const currency = import.meta.env.VITE_CURRENCY;
   const [shows, setShows] = useState([]);
   const [loading, setLoading] = useState(true);
+  const base_url = import.meta.env.VITE_BASE_URL
 
   const getAllShows = async () => {
     try {
       const { data } = await axios.get(
-        "http://localhost:3000/api/admin/all-shows",
+        `${base_url}/api/admin/all-shows`,
         {
           headers: {
             Authorization: `Bearer ${await getToken()}`,

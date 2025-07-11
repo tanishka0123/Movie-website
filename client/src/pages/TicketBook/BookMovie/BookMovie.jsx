@@ -28,6 +28,8 @@ function BookMovie() {
   const [video, setVideo] = useState(null);
   const [cast, setCast] = useState(null);
 
+  const base_url = import.meta.env.VITE_BASE_URL
+
   const { image_base_url } = useAppContext();
 
   const getCrew = async () => {
@@ -63,7 +65,7 @@ function BookMovie() {
     setLoading(true);
     try {
       const { data } = await axios.get(
-        `http://localhost:3000/api/show/${movieId}`
+        `${base_url}/api/show/${movieId}`
       );
       if (data.success) {
         setData(data);

@@ -13,6 +13,7 @@ import toast from "react-hot-toast";
 
 function Dashboard() {
   const { getToken, user, image_base_url } = useAppContext();
+  const base_url = import.meta.env.VITE_BASE_URL;
 
   const currency = import.meta.env.VITE_CURRENCY;
   const [dashboardData, setDashboardData] = useState({
@@ -46,14 +47,11 @@ function Dashboard() {
   ];
   const fetchDashBoardData = async () => {
     try {
-      const { data } = await axios.get(
-        "http://localhost:3000/api/admin/dashboard",
-        {
-          headers: {
-            Authorization: `Bearer ${await getToken()}`,
-          },
-        }
-      );
+      const { data } = await axios.get(`${base_url}/api/admin/dashboard`, {
+        headers: {
+          Authorization: `Bearer ${await getToken()}`,
+        },
+      });
       if (data.success) {
         setDashboardData(data.dashboardData);
         setLoading(false);

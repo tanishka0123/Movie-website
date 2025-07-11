@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 export const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
-  const base_url = import.meta.env.VITE_BASE_URL || "http://localhost:3000";
+  const base_url = import.meta.env.VITE_BASE_URL;
   const [isAdmin, setIsAdmin] = useState(false);
   const [shows, setShows] = useState([]);
 

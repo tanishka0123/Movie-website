@@ -21,6 +21,7 @@ function SeatBook() {
   const [selectedTime, setSelectedTime] = useState(null);
   const [show, setShow] = useState(null);
   const [occupiedSeats, setOccupiedSeats] = useState([]);
+  const base_url = import.meta.env.VITE_BASE_URL
 
   const nav = useNavigate();
   const { getToken, user } = useAppContext();
@@ -28,7 +29,7 @@ function SeatBook() {
 
   const getShow = async () => {
     try {
-      const { data } = await axios.get(`http://localhost:3000/api/show/${id}`);
+      const { data } = await axios.get(`${base_url}/api/show/${id}`);
       if (data.success) {
         setShow(data);
       }
@@ -79,7 +80,7 @@ function SeatBook() {
   const getOccupiedSeats = async () => {
     try {
       const { data } = await axios.get(
-        `http://localhost:3000/api/booking/seats/${selectedTime.showId}`
+        `${base_url}/api/booking/seats/${selectedTime.showId}`
       );
       if (data.success) {
         setOccupiedSeats(data.occupiedSeats);
@@ -101,7 +102,7 @@ function SeatBook() {
       const token = await getToken();
 
       const { data } = await axios.post(
-        `http://localhost:3000/api/booking/create`,
+        `${base_url}/api/booking/create`,
         { showId: selectedTime.showId, selectedSeats: selectedSeat },
         {
           headers: {

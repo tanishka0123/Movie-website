@@ -10,17 +10,15 @@ function ListBookings() {
   const currency = import.meta.env.VITE_CURRENCY;
   const [bookings, setBookings] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const base_url = import.meta.env.VITE_BASE_URL;
 
   const fetchBookingData = async () => {
     try {
-      const { data } = await axios.get(
-        "http://localhost:3000/api/admin/all-bookings",
-        {
-          headers: {
-            Authorization: `Bearer ${await getToken()}`,
-          },
-        }
-      );
+      const { data } = await axios.get(`${base_url}/api/admin/all-bookings`, {
+        headers: {
+          Authorization: `Bearer ${await getToken()}`,
+        },
+      });
       setBookings(data.bookings);
       setIsLoading(false);
     } catch (error) {
