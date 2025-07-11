@@ -2,6 +2,7 @@ import { Inngest } from "inngest";
 import User from "../models/User.js";
 import Booking from "../models/Booking.js";
 import Show from "../models/Show.js";
+import sendEmail from "../configs/nodeMailer.js";
 
 export const inngest = new Inngest({ id: "movix" });
 
@@ -179,13 +180,60 @@ const releaseSeatsAndDeleteBooking = inngest.createFunction(
   }
 );
 
+//inngest function to send email after confirmed booking
+const sendBookingConfirmationEmail = inngest.createFunction(
+  { id: "send-booking-confirmation-email" },
+  { event: "app/show.booked" },
+  async ({ event, step }) => {
+    const { bookingId } = event.data;
+    const booking = await Booking.findById(bookingId)
+      .populate({
+        path: "show",
+        populate: {
+          path: "movie",
+          model: " Movie",
+        },
+      })
+      .populate("user");
+    await sendEmail({
+      to: booking.user.email,
+      subject: `Payment Confirmation: "${booking.show.movie.title}" booked!`,
+      body: ` <div style="font-family: Arial, sans-serif; padding: 24px; background-color: #fefefe; border-radius: 10px; color: #333;">
+                        <h2 style="color: #28a745;">Hi ${
+                          booking.user.name
+                        },</h2>
+                        <p style="font-size: 16px;">
+                            Your booking for <strong style="color: #F84565;">"${
+                              booking.show.movie.title
+                            }"</strong> has been successfully confirmed! 🎟️
+                        </p>
+                        <div style="margin: 20px 0; padding: 16px; background-color: #f8f9fa; border-left: 5px solid #28a745; border-radius: 6px;">
+                            <p><strong>Date:</strong> ${new Date(
+                              booking.show.showDateTime
+                            ).toLocaleDateString("en-US", {
+                              timeZone: "Asia/Kolkata",
+                            })}</p>
+                            <p><strong>Time:</strong> ${new Date(
+                              booking.show.showDateTime
+                            ).toLocaleTimeString("en-US", {
+                              timeZone: "Asia/Kolkata",
+                            })}</p>
+                        </div>
+                        <p style="font-size: 15px;">We’re thrilled to have you! Get ready for an amazing movie experience. 🍿</p>
+                        <br/>
+                        <p style="font-size: 14px; color: #555;">Thanks for booking with us!<br/><strong>- Movix Team</strong></p>
+                    </div>`,
+    });
+  }
+);
+
 // Export all Inngest functions
 export const functions = [
   syncUserCreation,
   syncUserDeletion,
   syncUserUpdation,
-  // Uncomment if you want to handle session events
   handleSessionCreated,
   handleSessionRemoved,
   releaseSeatsAndDeleteBooking,
+  sendBookingConfirmationEmail,
 ];
