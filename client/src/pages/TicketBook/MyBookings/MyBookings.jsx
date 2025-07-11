@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { dummyBookingData } from "../DummyData";
 import Spinner from "../../../components/spinner/Spinner";
 import timeFormat from "../../../lib/timeFormat";
 import { dateFormat } from "../../../lib/dateFormat";
@@ -68,11 +67,6 @@ function MyBookings() {
                 {currency}
                 {item.amount}
               </p>
-              {!item.isPaid && (
-                <Link to={item.paymentLink} className="pay-now-btn">
-                  Pay Now
-                </Link>
-              )}
             </div>
             <div className="ticket-info">
               <p>

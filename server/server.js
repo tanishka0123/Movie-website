@@ -9,27 +9,20 @@ import showRouter from "./routes/showRoutes.js";
 import bookingRouter from "./routes/bookingRoutes.js";
 import adminRouter from "./routes/adminRoutes.js";
 import userRouter from "./routes/userRoutes.js";
-import { stripeWebhooks } from "./controllers/stripeWebhook.js";
+import { razorpayWebhook } from "./controllers/razorWebhook.js";
 
 const app = express();
 const port = 3000;
 
 await connectDB();
-// Add after connectDB()
-console.log("🔵 Environment check:");
-console.log("🔵 STRIPE_SECRET_KEY:", process.env.STRIPE_SECRET_KEY ? "Present" : "Missing");
-console.log("🔵 STRIPE_WEBHOOK_SECRET:", process.env.STRIPE_WEBHOOK_SECRET ? "Present" : "Missing");
 
-// IMPORTANT: Stripe webhook route MUST come before other middleware
-// Stripe webhooks need raw body and no authentication
-app.use("/api/stripe", (req, res, next) => {
-  console.log("🔵 Stripe webhook endpoint hit");
-  console.log("🔵 Method:", req.method);
-  console.log("🔵 Headers:", req.headers);
-  next();
-}, express.raw({ type: "application/json" }), stripeWebhooks);
+app.post(
+  "/api/razorpay/webhook",
+  express.raw({ type: "application/json" }),
+  razorpayWebhook
+);
 
-// Middleware (applied to all routes below this point)
+// Middleware
 app.use(express.json());
 app.use(cors());
 app.use(
@@ -40,14 +33,13 @@ app.use(
   })
 );
 
-// Routes (these will have Clerk middleware applied)
+// Routes
 app.get("/", (req, res) => res.send("Server is live"));
 app.use("/api/inngest", serve({ client: inngest, functions }));
 app.use("/api/show", showRouter);
 app.use("/api/booking", bookingRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/user", userRouter);
-
 
 // Start the server
 app.listen(port, () => {
