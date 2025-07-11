@@ -43,9 +43,11 @@
     flex-direction: column;
     flex-wrap: nowrap;
     gap: 30px;
+    margin-bottom: 50px;
     @include md {
       gap: 50px;
       flex-direction: row;
+      margin-bottom: 130px;
     }
     .left {
       flex-shrink: 0;
@@ -194,7 +196,7 @@
 
   button {
     width: 100px;
-    height: 50px;
+    height: 40px;
     background: var(--gradient);
     color: white;
 
@@ -204,9 +206,9 @@
     font-size: 16px;
     cursor: pointer;
     @include md {
-      width: 200px;
-      height: 60px;
-      font-size: 18px;
+      width: 180px;
+      height: 50px;
+      font-size: 20px;
     }
   }
 
@@ -253,6 +255,7 @@
   }
 }
 
+// Enhanced styles for the mobile date dropdown
 .datePopup {
   display: flex;
   justify-content: center;
@@ -265,6 +268,7 @@
   opacity: 0;
   visibility: hidden;
   z-index: 9;
+
   .opacityLayer {
     position: absolute;
     top: 0;
@@ -277,68 +281,241 @@
     opacity: 0;
     transition: opacity 400ms;
   }
+
   .datePicker {
     position: relative;
-    width: 900px;
-    height: 200px;
-    aspect-ratio: 16 / 9;
-    background: linear-gradient(98.37deg, #f89e00 0.99%, #da2f68 100%);
+    width: 90%;
+
     transform: scale(0.2);
     transition: transform 250ms;
-    border-radius: 20px;
+
+    // Mobile-specific styling
+    @media (max-width: 768px) {
+      width: 95%;
+      max-width: 350px;
+      margin: 20px;
+    }
+
+    .dateDropdownWrapper {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 30px 25px;
+      background: linear-gradient(98.37deg, #f89e00 0.99%, #da2f68 100%);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      gap: 20px;
+
+      .reactSelect {
+        width: 100%;
+        font-family: inherit;
+        font-size: 16px;
+        z-index: 9999;
+
+        .react-select__control {
+          background-color: white;
+          border-radius: 15px;
+          border: none;
+          min-height: 55px;
+          padding: 0 10px;
+          font-size: 16px;
+          font-weight: 500;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .react-select__menu {
+          border-radius: 12px;
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+          overflow: hidden;
+        }
+
+        .react-select__option {
+          padding: 12px 20px;
+          background-color: white;
+          color: #333;
+          font-size: 16px;
+          cursor: pointer;
+
+          &--is-focused {
+            background-color: #f8f9fa;
+          }
+
+          &--is-selected {
+            background-color: #ffe0ec;
+            color: #da2f68;
+            font-weight: bold;
+          }
+        }
+      }
+
+      .dropdownTitle {
+        color: white;
+        font-size: 20px;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 5px;
+      }
+
+      .mobileDateSelect {
+        width: 100%;
+        height: 55px;
+        border: none;
+        outline: none;
+        font-size: 16px;
+        border-radius: 15px;
+        padding: 0 20px;
+        background: white;
+        color: #333;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        font-weight: 500;
+
+        &:focus {
+          box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+        }
+
+        &:hover {
+          background: #f8f9fa;
+        }
+
+        option {
+          padding: 10px;
+          font-size: 16px;
+          background: white;
+          color: #333;
+        }
+      }
+
+      .buttonGroup {
+        display: flex;
+        gap: 15px;
+        width: 100%;
+        margin-top: 10px;
+      }
+
+      .bookNowBtn {
+        flex: 1;
+        height: 50px;
+        border: none;
+        outline: none;
+        font-size: 16px;
+        font-weight: bold;
+        background: white;
+        color: #da2f68;
+        border-radius: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+
+        &:hover {
+          background: #ffe0ec;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        &:active {
+          transform: translateY(0);
+        }
+      }
+
+      .cancelBtn {
+        flex: 1;
+        height: 50px;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        outline: none;
+        font-size: 16px;
+        font-weight: bold;
+        background: transparent;
+        color: white;
+        border-radius: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.1);
+          border-color: rgba(255, 255, 255, 0.8);
+        }
+
+        &:active {
+          transform: translateY(1px);
+        }
+      }
+    }
+
+    // Desktop styles remain the same
+    @media (min-width: 769px) {
+      width: 900px;
+      height: 200px;
+      aspect-ratio: 16 / 9;
+
+      .dateDropdownWrapper {
+        display: none;
+      }
+    }
 
     .chooseDateContainer {
       height: 100%;
-      padding: 30px 40px;
+      padding: 30px 58px;
       display: flex;
       align-items: center;
-      flex-direction: row;
       justify-content: space-between;
       color: #fff;
-    }
-
-    .DateContent {
-      display: flex;
-      flex-direction: column;
-    }
-    .chooseDateTitle {
-      font-size: 20px;
-      font-weight: 600;
-      padding-bottom: 10px;
-    }
-
-    .dateScroller {
-      display: flex;
-      align-items: center;
-      overflow-x: auto;
+      background: linear-gradient(98.37deg, #f89e00 0.99%, #da2f68 100%);
+      border-radius: 20px;
       gap: 10px;
 
-      .arrowBtn {
-        background: transparent;
-        border: none;
-        font-size: 20px;
-        color: white;
-        cursor: pointer;
+      .DateContent {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        max-width: 70%;
+
+        .arrowBtn {
+          font-size: 24px;
+          color: white;
+          cursor: pointer;
+          user-select: none;
+          flex-shrink: 0;
+        }
+
+        .dateScroller {
+          display: flex;
+          overflow-x: auto;
+          flex: 1;
+          gap: 10px;
+          padding: 10px 0;
+          scroll-behavior: smooth;
+          scrollbar-width: none;
+
+          &::-webkit-scrollbar {
+            display: none;
+          }
+        }
       }
 
       .dateBox {
-        background: transparent;
-        border: 2px solid rgba(255, 255, 255, 0.326);
-        border-radius: 10px;
-        padding: 15px;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        border-radius: 12px;
+        padding: 10px 14px;
         min-width: 60px;
         text-align: center;
+        font-size: 14px;
         cursor: pointer;
-        transition: 0.3s;
-        font-size: 15px;
+        white-space: nowrap;
+        transition: all 0.3s ease;
 
         &:hover {
-          background-color: rgba(255, 255, 255, 0.3);
+          background: rgba(255, 255, 255, 0.2);
         }
 
         &.active {
-          background-color: #fff;
-          color: #d83d71;
+          background: #fff;
+          color: #da2f68;
           font-weight: bold;
         }
       }
@@ -371,8 +548,16 @@
       right: 0;
       color: white;
       cursor: pointer;
+
+      @media (max-width: 768px) {
+        top: -35px;
+        font-size: 24px;
+        padding: 8px;
+        transition: all 0.3s ease;
+      }
     }
   }
+
   &.visible {
     opacity: 1;
     visibility: visible;
@@ -386,9 +571,9 @@
 }
 
 .booking-castSection {
-  padding-top: 90px;
   position: relative;
   margin-bottom: 50px;
+
   .booking-sectionHeading {
     font-size: 24px;
     color: white;

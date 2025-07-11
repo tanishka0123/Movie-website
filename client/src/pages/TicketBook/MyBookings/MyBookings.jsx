@@ -45,45 +45,51 @@ function MyBookings() {
 
       <h1 className="booking-heading">My Bookings</h1>
 
-      {bookings?.map((item, index) => (
-        <div className="booking-card" key={index}>
-          <div className="booking-info">
-            <img
-              src={image_base_url + item.show.movie.poster_path}
-              alt=""
-              className="booking-poster"
-            />
-            <div className="booking-details">
-              <p className="movie-title">{item.show.movie.title}</p>
-              <p className="movie-runtime">
-                {timeFormat(item.show.movie.runtime)}
-              </p>
-              <p className="movie-date">{dateFormat(item.show.showDateTime)}</p>
+      {bookings.length > 0 ? (
+        bookings.map((item, index) => (
+          <div className="booking-card" key={index}>
+            <div className="booking-info">
+              <img
+                src={image_base_url + item.show.movie.poster_path}
+                alt=""
+                className="booking-poster"
+              />
+              <div className="booking-details">
+                <p className="movie-title">{item.show.movie.title}</p>
+                <p className="movie-runtime">
+                  {timeFormat(item.show.movie.runtime)}
+                </p>
+                <p className="movie-date">
+                  {dateFormat(item.show.showDateTime)}
+                </p>
+              </div>
+            </div>
+            <div className="booking-summary">
+              <div className="payment-details">
+                <p className="booking-amount">
+                  {currency}
+                  {item.amount}
+                </p>
+              </div>
+              <div className="ticket-info">
+                <p>
+                  <span>Total Tickets:</span> {item.bookedSeats.length}
+                </p>
+                <p>
+                  <span>Seat Number:</span> {item.bookedSeats.join(", ")}
+                </p>
+                {!item.isPaid && (
+                  <Link to={item.paymentLink} className="pay-now-btn">
+                    Pay Now
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
-          <div className="booking-summary">
-            <div className="payment-details">
-              <p className="booking-amount">
-                {currency}
-                {item.amount}
-              </p>
-              {!item.isPaid && (
-                <Link to={item.paymentLink} className="pay-now-btn">
-                  Pay Now
-                </Link>
-              )}
-            </div>
-            <div className="ticket-info">
-              <p>
-                <span>Total Tickets:</span> {item.bookedSeats.length}
-              </p>
-              <p>
-                <span>Seat Number:</span> {item.bookedSeats.join(", ")}
-              </p>
-            </div>
-          </div>
-        </div>
-      ))}
+        ))
+      ) : (
+        <div className="nobooking">No Bookings Yet Made </div>
+      )}
     </div>
   ) : (
     <Spinner initial={true} />

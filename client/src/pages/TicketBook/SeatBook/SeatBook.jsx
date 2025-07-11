@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "./style.scss";
 import { FaClockRotateLeft } from "react-icons/fa6";
@@ -23,8 +23,8 @@ function SeatBook() {
   const [occupiedSeats, setOccupiedSeats] = useState([]);
 
   const nav = useNavigate();
-
   const { getToken, user } = useAppContext();
+  const seatAreaRef = useRef(null);
 
   const getShow = async () => {
     try {
@@ -42,16 +42,15 @@ function SeatBook() {
       return toast.error("Please select a time slot to book.");
     }
     if (!selectedSeat.includes(seatId) && selectedSeat.length > 4) {
-      return toast.error("You can only select upto 5 seats");
+      return toast.error("You can only select up to 5 seats");
     }
-
     if (occupiedSeats.includes(seatId)) {
       return toast.error("This seat is already booked");
     }
 
     setSelectedSeat((prev) =>
       prev.includes(seatId)
-        ? prev.filter((seat) => seat != seatId)
+        ? prev.filter((seat) => seat !== seatId)
         : [...prev, seatId]
     );
   };
@@ -66,8 +65,8 @@ function SeatBook() {
               key={seatId}
               onClick={() => handleSeatClick(seatId)}
               className={`singleSeat ${
-                selectedSeat.includes(seatId) && "primary"
-              } ${occupiedSeats.includes(seatId) && "occupied"}`}
+                selectedSeat.includes(seatId) ? "primary" : ""
+              } ${occupiedSeats.includes(seatId) ? "occupied" : ""}`}
             >
               {seatId}
             </button>
@@ -93,56 +92,41 @@ function SeatBook() {
   };
 
   const bookTickets = async () => {
-  try {
-
-    if (!user) return toast.error("Please login to proceed");
-    if (!selectedTime || !selectedSeat.length) {
-      return toast.error("Please select time and seats");
-    }
-
-    const token = await getToken();
-
-    const { data } = await axios.post(
-      `http://localhost:3000/api/booking/create`,
-      { showId: selectedTime.showId, selectedSeats: selectedSeat },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+    try {
+      if (!user) return toast.error("Please login to proceed");
+      if (!selectedTime || !selectedSeat.length) {
+        return toast.error("Please select time and seats");
       }
-    );
 
-    console.log("API Response:", data);
+      const token = await getToken();
 
-    if (data.success) {
+      const { data } = await axios.post(
+        `http://localhost:3000/api/booking/create`,
+        { showId: selectedTime.showId, selectedSeats: selectedSeat },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-      if (data.url) {
-        // Show loading message
+      if (data.success) {
         toast.loading("Redirecting to payment...", { duration: 2000 });
-
         window.location.href = data.url;
       } else {
-        console.log("No URL in response");
-        toast.error("Payment URL not received");
+        toast.error(data.message || "Booking failed");
       }
-    } else {
-      console.log("Booking failed:", data.message);
-      toast.error(data.message || "Booking failed");
+    } catch (error) {
+      if (error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else if (error.message) {
+        toast.error(error.message);
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
     }
-  } catch (error) {
-    console.error("Frontend booking error:", error);
-    console.error("Error response:", error.response?.data);
-    
-    if (error.response?.data?.message) {
-      toast.error(error.response.data.message);
-    } else if (error.message) {
-      toast.error(error.message);
-    } else {
-      toast.error("Something went wrong. Please try again.");
-    }
-  }
-};
+  };
 
   useEffect(() => {
     getShow();
@@ -154,10 +138,17 @@ function SeatBook() {
     }
   }, [selectedTime]);
 
+  // Scroll to center of seat area
+  useEffect(() => {
+    if (seatAreaRef.current) {
+      const container = seatAreaRef.current;
+      container.scrollLeft = (container.scrollWidth - container.clientWidth) / 2;
+    }
+  }, []);
+
   return (
     <div className="topContainer">
       <div className="blur-circle1" />
-
       <div className="container">
         <div className="timings">
           <p className="heading">Available Timings</p>
@@ -178,18 +169,19 @@ function SeatBook() {
         </div>
         <div className="seats">
           <h1 className="title">Select Your Seats</h1>
-          <img src="/screenImage.svg" alt="screen" />
-          <p className="small-text">SCREEN SIDE</p>
-          <div className="seatarea">
-            <div className="frontrows">
-              {groupRows[0].map((row) => renderSeats(row))}
-            </div>
-            <div className="nextrows">
-              {groupRows.slice(1).map((group, idx) => (
-                <div className="rows" key={idx}>
-                  {group.map((row) => renderSeats(row))}
-                </div>
-              ))}
+          <div className="seatarea" ref={seatAreaRef}>
+            <div className="seat-scroll-wrapper">
+              <img src="/screenImage.svg" alt="screen" className="screen-image" />
+              <div className="frontrows">
+                {groupRows[0].map((row) => renderSeats(row))}
+              </div>
+              <div className="nextrows">
+                {groupRows.slice(1).map((group, idx) => (
+                  <div className="rows" key={idx}>
+                    {group.map((row) => renderSeats(row))}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
           <button className="btn" onClick={bookTickets}>

@@ -81,165 +81,166 @@ function BookMovie() {
   }, [movieId]);
 
   return (
-    <ContentWrapper>
+    <>
       <div className="detailsBanner">
         {!loading ? (
           <>
-            {!!data && (
-              <React.Fragment>
-                <div className="backdrop-img">
-                  <Img src={image_base_url + data.movie.backdrop_path} />
-                </div>
-                <div className="opacity-layer"></div>
-
-                <div className="content">
-                  <div className="left">
-                    {data.movie.poster_path ? (
-                      <Img
-                        className="posterImg"
-                        src={image_base_url + data.movie.poster_path}
-                      />
-                    ) : (
-                      <Img className="posterImg" src={PosterFallback} />
-                    )}
+            <ContentWrapper>
+              {!!data && (
+                <React.Fragment>
+                  <div className="backdrop-img">
+                    <Img src={image_base_url + data.movie.backdrop_path} />
                   </div>
-                  <div className="right">
-                    <div className="titleContainer">
-                      <div className="title">
-                        {`${data.movie.name || data.movie.title} (${dayjs(
-                          data?.movie.release_date
-                        ).format("YYYY")})`}
+                  <div className="opacity-layer"></div>
+
+                  <div className="content">
+                    <div className="left">
+                      {data.movie.poster_path ? (
+                        <Img
+                          className="posterImg"
+                          src={image_base_url + data.movie.poster_path}
+                        />
+                      ) : (
+                        <Img className="posterImg" src={PosterFallback} />
+                      )}
+                    </div>
+                    <div className="right">
+                      <div className="titleContainer">
+                        <div className="title">
+                          {`${data.movie.name || data.movie.title} (${dayjs(
+                            data?.movie.release_date
+                          ).format("YYYY")})`}
+                        </div>
+
+                        <button
+                          onClick={() => {
+                            setBook(true);
+                          }}
+                        >
+                          Tickets
+                        </button>
+                      </div>
+                      <div className="subtitle">{data.movie.tagline}</div>
+
+                      <div className="genres">
+                        {data.movie.genres?.map((g) => {
+                          return (
+                            <div key={g.id} className="genre">
+                              {g.name}
+                            </div>
+                          );
+                        })}
                       </div>
 
-                      <button
-                        onClick={() => {
-                          setBook(true);
-                        }}
-                      >
-                        Book Tickets
-                      </button>
-                    </div>
-                    <div className="subtitle">{data.movie.tagline}</div>
+                      <div className="row">
+                        <CircleRating
+                          rating={data.movie.vote_average?.toFixed(1)}
+                        />
+                        <div
+                          className="playbtn"
+                          onClick={() => {
+                            setShow(true);
+                            setVideoId(video?.results?.[0].key);
+                          }}
+                        >
+                          <PlayIcon />
+                          <span className="text">Watch Trailer</span>
+                        </div>
+                      </div>
 
-                    <div className="genres">
-                      {data.movie.genres?.map((g) => {
-                        return (
-                          <div key={g.id} className="genre">
-                            {g.name}
+                      <div className="overview">
+                        <div className="heading">Overview</div>
+                        <div className="description">{data.movie.overview}</div>
+                      </div>
+
+                      <div className="info">
+                        {data.movie.status && (
+                          <div className="infoItem">
+                            <span className="text bold">Status: </span>
+                            <span className="text">{data.movie.status}</span>
                           </div>
-                        );
-                      })}
-                    </div>
-
-                    <div className="row">
-                      <CircleRating
-                        rating={data.movie.vote_average?.toFixed(1)}
-                      />
-                      <div
-                        className="playbtn"
-                        onClick={() => {
-                          setShow(true);
-                          setVideoId(video?.results?.[0].key);
-                        }}
-                      >
-                        <PlayIcon />
-                        <span className="text">Watch Trailer</span>
+                        )}
+                        {data.release_date && (
+                          <div className="infoItem">
+                            <span className="text bold">Release Date: </span>
+                            <span className="text">
+                              {dayjs(data.movie.release_date).format(
+                                "MMM D, YYYY"
+                              )}
+                            </span>
+                          </div>
+                        )}
+                        {data.runtime && (
+                          <div className="infoItem">
+                            <span className="text bold">Runtime: </span>
+                            <span className="text">
+                              {timeFormat(data.movie.runtime)}
+                            </span>
+                          </div>
+                        )}
                       </div>
-                    </div>
 
-                    <div className="overview">
-                      <div className="heading">Overview</div>
-                      <div className="description">{data.movie.overview}</div>
-                    </div>
-
-                    <div className="info">
-                      {data.movie.status && (
-                        <div className="infoItem">
-                          <span className="text bold">Status: </span>
-                          <span className="text">{data.movie.status}</span>
-                        </div>
-                      )}
-                      {data.release_date && (
-                        <div className="infoItem">
-                          <span className="text bold">Release Date: </span>
+                      {director?.length > 0 && (
+                        <div className="info">
+                          <span className="text bold">Director: </span>
                           <span className="text">
-                            {dayjs(data.movie.release_date).format(
-                              "MMM D, YYYY"
-                            )}
+                            {director?.map((d, i) => (
+                              <span key={i}>
+                                {d.name}
+                                {director.length - 1 !== i && ", "}
+                              </span>
+                            ))}
                           </span>
                         </div>
                       )}
-                      {data.runtime && (
-                        <div className="infoItem">
-                          <span className="text bold">Runtime: </span>
+
+                      {writer?.length > 0 && (
+                        <div className="info">
+                          <span className="text bold">Writer: </span>
                           <span className="text">
-                            {timeFormat(data.movie.runtime)}
+                            {writer?.map((d, i) => (
+                              <span key={i}>
+                                {d.name}
+                                {writer.length - 1 !== i && ", "}
+                              </span>
+                            ))}
                           </span>
                         </div>
                       )}
                     </div>
-
-                    {director?.length > 0 && (
-                      <div className="info">
-                        <span className="text bold">Director: </span>
-                        <span className="text">
-                          {director?.map((d, i) => (
-                            <span key={i}>
-                              {d.name}
-                              {director.length - 1 !== i && ", "}
-                            </span>
-                          ))}
-                        </span>
-                      </div>
-                    )}
-
-                    {writer?.length > 0 && (
-                      <div className="info">
-                        <span className="text bold">Writer: </span>
-                        <span className="text">
-                          {writer?.map((d, i) => (
-                            <span key={i}>
-                              {d.name}
-                              {writer.length - 1 !== i && ", "}
-                            </span>
-                          ))}
-                        </span>
-                      </div>
-                    )}
                   </div>
-                </div>
-                <DatePopUp
-                  book={book}
-                  setBook={setBook}
-                  dateTime={data.dateTime}
-                  id={movieId}
-                />
-                <VideoPopup
-                  show={show}
-                  setShow={setShow}
-                  videoId={videoId}
-                  setVideoId={setVideoId}
-                />
-              </React.Fragment>
-            )}
+                  <DatePopUp
+                    book={book}
+                    setBook={setBook}
+                    dateTime={data.dateTime}
+                    id={movieId}
+                  />
+                  <VideoPopup
+                    show={show}
+                    setShow={setShow}
+                    videoId={videoId}
+                    setVideoId={setVideoId}
+                  />
+                </React.Fragment>
+              )}
 
-            <div className="booking-castSection">
-              <div className="booking-sectionHeading">Top Cast</div>
-              <div className="booking-listItems">
-                {cast?.map((item) => {
-                  return (
-                    <div key={item.id} className="booking-listItem">
-                      <div className="booking-profileImg">
-                        <img src={image_base_url + item.profile_path} />
+              <div className="booking-castSection">
+                <div className="booking-sectionHeading">Top Cast</div>
+                <div className="booking-listItems">
+                  {cast?.map((item) => {
+                    return (
+                      <div key={item.id} className="booking-listItem">
+                        <div className="booking-profileImg">
+                          <img src={image_base_url + item.profile_path} />
+                        </div>
+                        <div className="booking-name">{item.name}</div>
+                        <div className="character">{item.character}</div>
                       </div>
-                      <div className="booking-name">{item.name}</div>
-                      <div className="character">{item.character}</div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-
+            </ContentWrapper>
             <VideosSection data={video} loading={loading} />
             <Similar mediaType={"movie"} id={movieId} />
             <Recommendation mediaType={"movie"} id={movieId} />
@@ -261,7 +262,7 @@ function BookMovie() {
           </div>
         )}
       </div>
-    </ContentWrapper>
+    </>
   );
 }
 

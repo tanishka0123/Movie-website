@@ -20,12 +20,13 @@ const Header = () => {
   const location = useLocation();
 
   const { isAdmin } = useAppContext();
-
   const { user } = useUser();
   const { openSignIn } = useClerk();
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    setMobileMenu(false);
+    setShowSearch(false);
   }, [location]);
 
   const controlNavbar = () => {
@@ -76,14 +77,16 @@ const Header = () => {
       navigate("/explore/tv");
     }
     setMobileMenu(false);
+    setShowSearch(false);
   };
 
   return (
     <header className={`header ${mobileMenu ? "mobileView" : ""} ${show}`}>
       <ContentWrapper>
         <div className="logo" onClick={() => navigate("/")}>
-          <img src={logo} alt="" />
+          <img src={logo} alt="logo" />
         </div>
+
         <div className="centerMenu">
           <ul className="menuItems centerItems">
             <li className="menuItem" onClick={() => navigationHandler("book")}>
@@ -127,14 +130,45 @@ const Header = () => {
         </div>
 
         <div className="mobileMenuItems">
-          <HiOutlineSearch onClick={openSearch} />
           {mobileMenu ? (
             <VscChromeClose onClick={() => setMobileMenu(false)} />
           ) : (
             <SlMenu onClick={openMobileMenu} />
           )}
+          {!user ? (
+            <p className="menuItem" onClick={openSignIn}>
+              Login
+            </p>
+          ) : (
+            <UserButton />
+          )}
         </div>
       </ContentWrapper>
+
+      {mobileMenu && (
+        <ul className="menuItems mobileMenuList">
+          <li className="menuItem" onClick={() => navigationHandler("book")}>
+            Book Tickets
+          </li>
+          <li className="menuItem" onClick={() => navigationHandler("movie")}>
+            Movies
+          </li>
+          <li className="menuItem" onClick={() => navigationHandler("tv")}>
+            TV Shows
+          </li>
+          {user && (
+            <li className="menuItem" onClick={() => navigate("/my-bookings")}>
+              My bookings
+            </li>
+          )}
+          {isAdmin && (
+            <li className="menuItem" onClick={() => navigate("/admin")}>
+              Dashboard
+            </li>
+          )}
+        </ul>
+      )}
+
       {showSearch && (
         <div className="searchBar">
           <ContentWrapper>
