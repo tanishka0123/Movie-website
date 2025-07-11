@@ -8,6 +8,11 @@ const bookingSchema = new mongoose.Schema(
     bookedSeats: { type: Array, required: true },
     isPaid: { type: Boolean, default: false },
     paymentLink: { type: String },
+    bookingReference: {
+      type: String,
+      required: true,
+      unique: true, 
+    },
   },
   { timestamps: true }
 );
