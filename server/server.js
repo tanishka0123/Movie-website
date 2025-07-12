@@ -16,12 +16,36 @@ const port = 3000;
 
 await connectDB();
 
+const corsOptions = {
+  origin: [
+    "http://localhost:3000",
+    "http://localhost:5173", // Common Vite dev server port
+    "http://localhost:4173", // Common Vite preview port
+    "https://localhost:5173", // HTTPS version
+    "https://moviewebsite-sable.vercel.app", // deployed frontend
+  ],
+  credentials: true, // Allow credentials (cookies, authorization headers)
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "X-Requested-With",
+    "Accept",
+    "Origin",
+  ],
+  optionsSuccessStatus: 200, // Some legacy browsers choke on 204
+};
+
 //stripe webhook route
-app.use("/api/stripe", express.raw({ type: "application/json" }), stripeWebhooks);
+app.use(
+  "/api/stripe",
+  express.raw({ type: "application/json" }),
+  stripeWebhooks
+);
 
 // Middleware
+app.use(cors(corsOptions));
 app.use(express.json());
-app.use(cors());
 app.use(
   clerkMiddleware({
     debug: true, // Enable debug mode
