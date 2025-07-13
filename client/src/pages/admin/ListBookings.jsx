@@ -19,6 +19,7 @@ function ListBookings() {
           Authorization: `Bearer ${await getToken()}`,
         },
       });
+      console.log(data.bookings);
       setBookings(data.bookings);
       setIsLoading(false);
     } catch (error) {
@@ -51,7 +52,7 @@ function ListBookings() {
           <tbody>
             {bookings.map((booking, index) => (
               <tr key={index} className="listbookings-row">
-                <td className="listbookings-cell user">{booking.user.name}</td>
+                <td className="listbookings-cell user">{booking.user ? booking.user.name : "Guest"}</td>
                 <td className="listbookings-cell">
                   {booking.show.movie.title}
                 </td>

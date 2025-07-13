@@ -27,7 +27,7 @@ export const AppProvider = ({ children }) => {
       }
 
       const token = await getToken();
-
+      
       if (!token) {
         setIsAdmin(false);
         return;
@@ -48,7 +48,7 @@ export const AppProvider = ({ children }) => {
       }
     } catch (error) {
       setIsAdmin(false);
-      console.log(error.response?.status)
+      console.log(error.response?.status);
       if (error.response?.status === 401) {
         if (location.pathname.startsWith("/admin")) {
           navigate("/");
@@ -87,7 +87,15 @@ export const AppProvider = ({ children }) => {
     }
   }, [user, isSignedIn]);
 
-  const value = { fetchIsAdmin, user, getToken, navigate, isAdmin, shows, image_base_url };
+  const value = {
+    fetchIsAdmin,
+    user,
+    getToken,
+    navigate,
+    isAdmin,
+    shows,
+    image_base_url,
+  };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

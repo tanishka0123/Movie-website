@@ -57,9 +57,9 @@ const HeroBanner = () => {
               onChange={(e) => setQuery(e.target.value)}
               onKeyUp={searchQueryHandler}
             />
-            <button>Search</button>
+            <button onClick={() => navigate(`/search/${query}`)}>Search</button>
           </div>
-          <button onClick={()=> navigate("/book")} className="btn">
+          <button onClick={() => navigate("/book")} className="btn">
             Book Tickets <BiSolidCameraMovie size={"25px"} className="icon" />
           </button>
         </div>
