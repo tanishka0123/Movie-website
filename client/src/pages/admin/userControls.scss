@@ -1,0 +1,284 @@
+.usercontrols-wrapper {
+  min-height: 100vh;
+  max-width: 1000px;
+  color: white;
+  overflow-x: auto;
+
+
+  .usercontrols-stats {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 2;
+
+    .stat-card {
+      background: rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(3.5px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      min-width: 180px;
+
+      .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        background: rgba(218, 47, 104, 0.2);
+        color: var(--pink);
+
+        &.admin {
+          background: rgba(248, 158, 0, 0.2);
+          color: var(--orange);
+        }
+      }
+
+      .stat-info {
+        h3 {
+          font-size: 2rem;
+          font-weight: bold;
+          margin-bottom: 0.25rem;
+          color: white;
+        }
+
+        p {
+          color: #cbd5e1;
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+
+  .usercontrols-table-wrapper {
+    position: relative;
+    z-index: 2;
+    overflow-x: auto;
+    background: rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(3.5px);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+
+    .usercontrols-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1000px;
+
+      .usercontrols-header {
+        background: rgba(23, 61, 119, 0.3);
+        color: white;
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+        &:first-child {
+          border-radius: 12px 0 0 0;
+        }
+
+        &:last-child {
+          border-radius: 0 12px 0 0;
+        }
+      }
+
+      .usercontrols-row {
+        transition: background-color 0.2s ease;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.05);
+        }
+
+        &:last-child .usercontrols-cell {
+          border-bottom: none;
+        }
+
+        .usercontrols-cell {
+          padding: 1rem;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+          color: #cbd5e1;
+
+          &.user-id {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: var(--orange);
+          }
+
+          &.email {
+            color: #94a3b8;
+          }
+
+          &.name {
+            color: white;
+            font-weight: 500;
+          }
+
+          &.role {
+            .role-badge {
+              display: inline-flex;
+              align-items: center;
+              gap: 0.5rem;
+              padding: 0.5rem 1rem;
+              border-radius: 20px;
+              font-size: 0.85rem;
+              font-weight: 500;
+
+              &.admin {
+                background: rgba(248, 158, 0, 0.2);
+                color: var(--orange);
+                border: 1px solid rgba(248, 158, 0, 0.3);
+              }
+
+              &.user {
+                background: rgba(203, 213, 225, 0.1);
+                color: #cbd5e1;
+                border: 1px solid rgba(203, 213, 225, 0.2);
+              }
+            }
+          }
+
+          &.date {
+            color: #94a3b8;
+            font-size: 0.9rem;
+          }
+
+          &.actions {
+            .action-buttons {
+              display: flex;
+              gap: 0.5rem;
+            }
+
+            .btn {
+              display: inline-flex;
+              align-items: center;
+              gap: 0.5rem;
+              padding: 0.5rem 1rem;
+              border: none;
+              border-radius: 8px;
+              cursor: pointer;
+              font-size: 0.85rem;
+              font-weight: 500;
+              transition: all 0.2s ease;
+
+              &:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+              }
+
+              .loading-spinner {
+                width: 16px;
+                height: 16px;
+                border: 2px solid rgba(255, 255, 255, 0.3);
+                border-top: 2px solid white;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+                
+              }
+
+              &.make-admin {
+                background: rgba(34, 197, 94, 0.2);
+                color: #22c55e;
+                border: 1px solid rgba(34, 197, 94, 0.3);
+
+                &:hover:not(:disabled) {
+                  background: rgba(34, 197, 94, 0.3);
+                  transform: translateY(-2px);
+                }
+              }
+
+              &.remove-admin {
+                background: rgba(239, 68, 68, 0.2);
+                color: #ef4444;
+                border: 1px solid rgba(239, 68, 68, 0.3);
+
+                &:hover:not(:disabled) {
+                  background: rgba(239, 68, 68, 0.3);
+                  transform: translateY(-2px);
+                }
+              }
+            }
+
+            .current-user {
+              color: var(--orange);
+              font-size: 0.85rem;
+              font-weight: 500;
+              font-style: italic;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Responsive design
+@media (max-width: 1200px) {
+  .usercontrols-wrapper {
+    .usercontrols-stats {
+      flex-wrap: wrap;
+      gap: 1rem;
+
+      .stat-card {
+        flex: 1;
+        min-width: 160px;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .usercontrols-wrapper {
+    padding: 1rem;
+
+    .admin-title {
+      font-size: 2rem;
+    }
+
+    .usercontrols-stats {
+      .stat-card {
+        padding: 1rem;
+        min-width: 140px;
+
+        .stat-icon {
+          width: 40px;
+          height: 40px;
+          font-size: 1.2rem;
+        }
+
+        .stat-info h3 {
+          font-size: 1.5rem;
+        }
+      }
+    }
+
+    .usercontrols-table-wrapper {
+      .usercontrols-table {
+        .usercontrols-header,
+        .usercontrols-cell {
+          padding: 0.75rem;
+          font-size: 0.85rem;
+        }
+
+        .usercontrols-cell.actions {
+          .btn {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+          }
+        }
+      }
+    }
+  }
+}

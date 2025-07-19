@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect } from "react"; 
 import { Routes, Route, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchDataFromApi } from "./utils/api";
@@ -21,6 +21,7 @@ import Dashboard from "./pages/admin/dashboard/Dashboard";
 import Addshows from "./pages/admin/Addshows";
 import ListShows from "./pages/admin/ListShows";
 import ListBookings from "./pages/admin/ListBookings";
+import UserControls from "./pages/admin/UserControls";
 import { Toaster } from "react-hot-toast";
 import { useAppContext } from "./context/AppContext";
 import { SignIn } from "@clerk/clerk-react";
@@ -98,6 +99,7 @@ function App() {
           <Route path="add-shows" element={<Addshows />} />
           <Route path="list-shows" element={<ListShows />} />
           <Route path="list-bookings" element={<ListBookings />} />
+          <Route path="user-controls" element={<UserControls />} />
         </Route>
 
         <Route path="*" element={<PageNotFound />} />

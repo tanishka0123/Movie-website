@@ -5,6 +5,7 @@ import { MdOutlineDashboard } from "react-icons/md";
 import { GrChapterAdd } from "react-icons/gr";
 import { RiPlayList2Line } from "react-icons/ri";
 import { GoChecklist } from "react-icons/go";
+import { FiUsers } from "react-icons/fi";
 import "./adminSidebar.scss"
 import profilePic from "../../assets/avatar.png";
 
@@ -16,6 +17,11 @@ const adminLinks = [
     name: "List Bookings",
     path: "/admin/list-bookings",
     icon: <GoChecklist />,
+  },
+  {
+    name: "User Controls",
+    path: "/admin/user-controls",
+    icon: <FiUsers />,
   },
 ];
 
